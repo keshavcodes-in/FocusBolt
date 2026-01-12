@@ -54,7 +54,7 @@ export function ExpandedPlayer({
       {/* Popup Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
         <div 
-          className="rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full max-h-[80vh] border animate-in zoom-in-95 duration-300"
+          className="rounded-3xl shadow-2xl overflow-hidden max-w-lg w-full max-h-[80vh] border animate-in zoom-in-95 duration-300"
           style={{
             background: isImageTheme 
               ? 'rgba(0, 0, 0, 0.85)' 
@@ -197,7 +197,7 @@ export function ExpandedPlayer({
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4 min-w-0 flex-1">
                             <div 
-                              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border"
+                              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
                               style={{
                                 backgroundColor: currentTrack?.id === track.id 
                                   ? (isImageTheme ? 'rgba(255, 255, 255, 0.25)' : `${currentTheme.digitColor}20`)

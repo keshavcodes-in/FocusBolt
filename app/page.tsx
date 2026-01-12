@@ -685,7 +685,7 @@ function AppBody() {
                     <button
                       onClick={reset}
                       aria-label="Reset"
-                      className="absolute p-1.5 sm:p-2 rounded-full focus:outline-none z-10 hover:opacity-80 transition-opacity"
+                      className="absolute p-1.5 sm:p-2 rounded-full focus:outline-none z-30 hover:opacity-80 transition-opacity"
                       style={{
                         top: isTablet ? "60px" : isMobile ? "27px" : "25px",
                         right: isTablet ? "10px" : isMobile ? "1px" : "50px",
@@ -859,9 +859,9 @@ function AppBody() {
               onPrevious={audioPlayer.playPrevious}
               currentTime={audioPlayer.currentTime}
               duration={audioPlayer.duration}
-              volume={audioPlayer.volume}
+              // volume={audioPlayer.volume}
               onSeek={audioPlayer.seek}
-              onVolumeChange={audioPlayer.changeVolume}
+              // onVolumeChange={audioPlayer.changeVolume}
               isExpanded={isExpanded}
               onToggleExpand={handleToggleExpand}
               currentTheme={currentTheme}

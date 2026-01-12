@@ -91,76 +91,61 @@ export function SessionQuote({ currentTheme }: { currentTheme: any }) {
     }
   }
 
-  return (
-    <div
-      className="mt-0 mb-2 w-full max-w-lg mx-auto rounded-lg py-4 px-10  text-center transition-all duration-500 relative max-h-[60px] flex items-center justify-center"
-      style={{
-        color: currentTheme.digitColor,
-        background: isImageTheme
-          ? "rgba(255,255,255,0.85)"
-          : `${currentTheme.background}`,
-        backdropFilter: isImageTheme ? "blur(8px)" : "none",
-      }}
+return (
+  <div
+    className="group mt-2 mb-4 w-full max-w-lg mx-auto py-2 px-10 text-center transition-all duration-500 relative min-h-[60px] flex items-center justify-center"
+    style={{
+      
+      color: isImageTheme ? "#ffffff" : currentTheme.digitColor,
+      
+    
+      background: isImageTheme ? "transparent" : `${currentTheme.background}`,
+      border: isImageTheme ? "none" : "none", 
+      
+      
+      backdropFilter: isImageTheme ? "none" : "none",
+    }}
+  >
+    <button
+      type="button"
+      onClick={handleStartEdit}
+      className="absolute top-0 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+      aria-label="Edit quote"
     >
-      <button
-        type="button"
-        onClick={handleStartEdit}
-        className="absolute top-2 right-2 z-20 text-md flex items-center cursor-pointer"
-        aria-label="Edit quote"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="icon icon-tabler-edit"
-        >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
-          <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
-          <path d="M16 5l3 3" />
-        </svg>
-      </button>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: isImageTheme ? "rgba(255,255,255,0.6)" : currentTheme.digitColor }}>
+        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+      </svg>
+    </button>
 
-      <div
-        className={`transition-opacity duration-300 ease-in-out relative z-10 w-full ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <div className="mx-auto w-full min-w-md flex flex-col items-center gap-1">
-          {isEditing ? (
-            <>
-              <input
-                ref={inputRef}
-                className="w-full bg-transparent border-b border-gray-400/70 text-lg md:text-xl font-medium italic leading-relaxed px-2 pb-0.5 text-center outline-none focus:border-blue-400"
-                value={draft}
-                maxLength={MAX_CHARS}
-                onChange={(e) => {
-                  setDraft(e.target.value);
-                  setError(null);
-                }}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-              />
-              <div className=" text-[11px] text-gray-400">
-                {draft.length}/{MAX_CHARS} characters
-              </div>
-              {error && (
-                <div className="mt-0.5 text-[11px] text-red-400">{error}</div>
-              )}
-            </>
-          ) : (
-            <p className="text-lg md:text-xl font-medium italic leading-relaxed px-5">
-              &ldquo;{quote.text}&rdquo;
-            </p>
-          )}
-        </div>
+    <div className={`transition-opacity duration-300 w-full ${isVisible ? "opacity-100" : "opacity-0"}`}>
+      <div className="mx-auto w-full flex flex-col items-center">
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            className="w-full bg-transparent border-b border-white/30 text-lg md:text-xl font-medium italic text-center outline-none"
+            value={draft}
+            maxLength={MAX_CHARS}
+            style={{ color: isImageTheme ? "#ffffff" : currentTheme.digitColor }}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+          />
+        ) : (
+          <p 
+            className="text-lg md:text-xl font-semibold italic leading-relaxed px-5"
+            style={{ 
+            
+              textShadow: isImageTheme 
+                ? "0px 2px 12px rgba(0, 0, 0, 0.9), 0px 1px 3px rgba(0, 0, 0, 1)" 
+                : "none" 
+            }}
+          >
+            &ldquo;{quote.text}&rdquo;
+          </p>
+        )}
       </div>
     </div>
-  );
+  </div>
+);
 }

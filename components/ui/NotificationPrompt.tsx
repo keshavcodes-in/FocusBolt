@@ -48,9 +48,7 @@ export function NotificationPrompt({
 }: NotificationPromptProps) {
  const isImageTheme = Boolean(currentTheme.backgroundImage);
    const color = getColor(currentTheme, isImageTheme);
- 
-
- 
+    const bellIconColor = isImageTheme ? currentTheme.digitColor : color;
 
   return (
   
@@ -108,7 +106,7 @@ export function NotificationPrompt({
         gap: 0,
         marginBottom: 10,
       }}>
-        <NotificationBellIcon color={color} />
+        <NotificationBellIcon color={bellIconColor} />
         <span
           style={{
             lineHeight: 1.5,

@@ -170,13 +170,11 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
   const visibility = useVisibility();
   const intervalRef = useRef<number | null>(null);
   const savedSecondsRef = useRef<number>(0); // Track already saved seconds
-const didInitDurationsRef = useRef(false);
+  const didInitDurationsRef = useRef(false);
   const durationFor = useCallback(
     (mode: Mode) => settings.durations[mode],
     [settings.durations]
   );
-  
-  
 
   // Counter daily focus minutes
   const { dailyMinutes, hasStarted } = useDailyFocus();
@@ -332,45 +330,43 @@ const didInitDurationsRef = useRef(false);
     });
   }, [setState, durationFor, onComplete]);
 
-//  Sync durations without killing persisted remaining on first load
-useEffect(() => {
-  // First time (initial hydration from localStorage) → do not touch `remaining`.
-  if (!didInitDurationsRef.current) {
-    didInitDurationsRef.current = true;
-    return;
-  }
-
-  setState((prev) => {
-    // Don't touch active timers
-    if (prev.isRunning) {
-      return prev;
+  //  Sync durations without killing persisted remaining on first load
+  useEffect(() => {
+    // First time (initial hydration from localStorage) → do not touch `remaining`.
+    if (!didInitDurationsRef.current) {
+      didInitDurationsRef.current = true;
+      return;
     }
 
-    // User changed durations (Save or preset) while timer is stopped:
-    // reset remaining to the new full duration for the current mode.
-    const newDuration = durationFor(prev.mode);
-    return { ...prev, remaining: newDuration };
-  });
-}, [settings.durations, durationFor, setState]);
+    setState((prev) => {
+      // Don't touch active timers
+      if (prev.isRunning) {
+        return prev;
+      }
 
+      // User changed durations (Save or preset) while timer is stopped:
+      // reset remaining to the new full duration for the current mode.
+      const newDuration = durationFor(prev.mode);
+      return { ...prev, remaining: newDuration };
+    });
+  }, [settings.durations, durationFor, setState]);
 
-  
   // Restore after browser reopen — treat reopen as a pause, keep remaining
-useEffect(() => {
-  setState((prev) => {
-    if (prev.epochMs && prev.isRunning) {
-      // Do NOT recompute remaining using Date.now().
-      // Just stop the timer and keep the persisted `remaining`.
-      return {
-        ...prev,
-        isRunning: false,
-        epochMs: null,
-      };
-    }
-    return prev;
-  });
-  // eslint-disable-next-line react-hooks
-}, []);
+  useEffect(() => {
+    setState((prev) => {
+      if (prev.epochMs && prev.isRunning) {
+        // Do NOT recompute remaining using Date.now().
+        // Just stop the timer and keep the persisted `remaining`.
+        return {
+          ...prev,
+          isRunning: false,
+          epochMs: null,
+        };
+      }
+      return prev;
+    });
+    // eslint-disable-next-line react-hooks
+  }, []);
 
   useEffect(() => {
     if (state.isRunning && intervalRef.current == null) {
@@ -486,10 +482,39 @@ useEffect(() => {
   }, [setState, durationFor, saveWorkProgress]);
 
   const reset = useCallback(() => {
-    // Reset save flag and tracking on reset
+    // 1. Calculate and save progress OUTSIDE of setState to prevent double-counting
+    const currentState = state; // Access current state directly from the hook
+
+    if (
+      currentState.mode === "work" &&
+      currentState.epochMs &&
+      currentState.workSessionStart > 0
+    ) {
+      const elapsed = Math.floor((Date.now() - currentState.epochMs) / 1000);
+      const total = durationFor("work");
+      const totalWorkedSeconds = Math.min(elapsed, total);
+
+      // Only save what hasn't been saved yet
+      const newSeconds = totalWorkedSeconds - savedSecondsRef.current;
+
+      if (newSeconds > 0) {
+        saveWorkProgress(newSeconds);
+        // Immediately update ref so no other logic can double-count these seconds
+        savedSecondsRef.current = totalWorkedSeconds;
+      }
+    }
+
+    // 2. Clear the interval immediately
+    if (intervalRef.current) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    // 3. Reset internal tracking flags
     sessionSaveCompleted = false;
     savedSecondsRef.current = 0;
 
+    // 4. Update the state to the clean reset values
     setState((prev) => ({
       ...prev,
       remaining: durationFor(prev.mode),
@@ -497,7 +522,7 @@ useEffect(() => {
       epochMs: null,
       workSessionStart: 0,
     }));
-  }, [durationFor, setState]);
+  }, [state, setState, durationFor, saveWorkProgress]);
 
   const skip = useCallback(() => {
     setState((prev) => {
@@ -548,15 +573,14 @@ useEffect(() => {
   );
 
   //  Prevent changing durations while timer is running
-const setDurations = useCallback(
-  (d: Settings["durations"]) =>
-    setSettings((s) => ({
-      ...s,
-      durations: d,
-    })),
-  [setSettings]
-);
-
+  const setDurations = useCallback(
+    (d: Settings["durations"]) =>
+      setSettings((s) => ({
+        ...s,
+        durations: d,
+      })),
+    [setSettings]
+  );
 
   const setLongInterval = useCallback(
     (n: number) =>
@@ -684,9 +708,7 @@ const setDurations = useCallback(
   );
 
   return (
-    <PomodoroContext.Provider value={ctx}>
-      {children}
-    </PomodoroContext.Provider>
+    <PomodoroContext.Provider value={ctx}>{children}</PomodoroContext.Provider>
   );
 }
 
