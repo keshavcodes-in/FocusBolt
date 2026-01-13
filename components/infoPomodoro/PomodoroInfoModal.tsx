@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { ColorTheme } from "@/lib/theme";
+import { getThemeStyles } from "@/lib/themeStyles"; 
 
 interface PomodoroInfoModalProps {
   isOpen: boolean;
@@ -15,18 +16,14 @@ export function PomodoroInfoModal({
 }: PomodoroInfoModalProps) {
   if (!isOpen) return null;
 
-  const isImageTheme = currentTheme.backgroundImage;
+  // centralized helper
+  const theme = getThemeStyles(currentTheme);
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 backdrop-blur-[2px]"
-        style={{
-          backgroundColor: isImageTheme
-            ? "rgba(0,0,0,0.25)"
-            : "rgba(0,0,0,0.4)",
-        }}
+        className="fixed inset-0 z-40 backdrop-blur-sm bg-black/30"
         onClick={onClose}
       />
 
@@ -34,50 +31,20 @@ export function PomodoroInfoModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
         <div
           className="rounded-3xl shadow-2xl overflow-hidden max-w-lg w-full animate-in zoom-in-95"
-          style={{
-            background: isImageTheme
-              ? "rgba(0,0,0,0.8)"
-              : currentTheme.background,
-            border: `1px solid ${
-              isImageTheme
-                ? "rgba(255,255,255,0.3)"
-                : currentTheme.cardBorder
-            }`,
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-          }}
+          style={theme.container}
         >
           {/* Header */}
-          <div
-            className="flex items-center justify-between px-6 py-4 border-b"
-            style={{
-              borderBottomColor: isImageTheme
-                ? "rgba(255,255,255,0.2)"
-                : currentTheme.cardBorder,
-            }}
+          <div 
+            className="flex items-center justify-between px-6 py-4 border-b" 
+            style={{ borderBottomColor: theme.item.border.split('1px solid ')[1] || "rgba(0,0,0,0.1)" }}
           >
-            <h2
-              className="text-xl font-bold"
-              style={{
-                color: isImageTheme
-                  ? "rgba(255,255,255,0.95)"
-                  : currentTheme.digitColor,
-              }}
-            >
+            <h2 className="text-xl font-bold" style={{ color: theme.text.primary }}>
               What is Pomodoro?
             </h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-full border-none transition-transform hover:scale-110"
-              style={{
-                color: isImageTheme
-                  ? "rgba(255,255,255,0.9)"
-                  : currentTheme.separatorColor,
-                borderColor: isImageTheme
-                  ? "rgba(255,255,255,0.3)"
-                  : currentTheme.cardBorder,
-                  cursor: "pointer",
-              }}
+              className="p-2 rounded-full transition-transform hover:scale-110 flex items-center justify-center"
+              style={{ color: theme.text.accent, cursor: "pointer" }}
             >
               ✕
             </button>
@@ -85,71 +52,32 @@ export function PomodoroInfoModal({
 
           {/* Body */}
           <div className="p-6 space-y-4 text-md leading-relaxed">
-            <p
-              style={{
-                color: isImageTheme
-                  ? "rgba(255,255,255,0.9)"
-                  : currentTheme.digitColor,
-              }}
-            >
+            <p style={{ color: theme.text.primary }}>
               The Pomodoro Technique is a time-management method that breaks
-              work into focused intervals— usually <strong>25 minutes of work</strong> followed
-              by a <strong>5‑minute break</strong>. Each cycle is called a"Pomodoro".
+              work into focused intervals— usually <strong>25 minutes</strong>.
             </p>
-            <p
-              style={{
-                color: isImageTheme
-                  ? "rgba(255,255,255,0.8)"
-                  : currentTheme.separatorColor,
-              }}
-            >
+            <p className="font-semibold" style={{ color: theme.text.secondary }}>
               Why it works:
             </p>
-            <ul
-              className="list-disc pl-5 space-y-2"
-              style={{
-                color: isImageTheme
-                  ? "rgba(255,255,255,0.85)"
-                  : currentTheme.separatorColor,
-              }}
-            >
+            <ul className="list-disc pl-5 space-y-2" style={{ color: theme.text.secondary }}>
               <li>Keeps your brain fresh and focused</li>
               <li>Reduces burnout by balancing work and rest</li>
-              <li>Makes big tasks feel less overwhelming</li>
-              <li>Boosts motivation with small wins every cycle</li>
+              <li>Boosts motivation with small wins</li>
             </ul>
-            <p
-              style={{
-                color: isImageTheme
-                  ? "rgba(255,255,255,0.9)"
-                  : currentTheme.digitColor,
-              }}
-            >
-              Think of each Pomodoro as a power-sprint: short bursts of deep focus,
-              followed by rest that recharges you.
-            </p>
           </div>
 
           {/* Footer */}
-          <div
-            className="flex justify-end px-6 py-4 border-t"
-            style={{
-              borderTopColor: isImageTheme
-                ? "rgba(255,255,255,0.2)"
-                : currentTheme.cardBorder,
-            }}
+          <div 
+            className="flex justify-end px-6 py-4 border-t" 
+            style={{ borderTopColor: theme.item.border.split('1px solid ')[1] || "rgba(0,0,0,0.1)" }}
           >
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl  transition-all hover:scale-105"
+              className="px-6 py-2 rounded-xl font-semibold transition-all hover:brightness-90 active:scale-95 shadow-sm"
               style={{
-                backgroundColor: isImageTheme
-                  ? "rgba(255,255,255,0.15)"
-                  : currentTheme.digitColor,
-                color: isImageTheme
-                  ? "rgba(255,255,255,0.9)"
-                  : currentTheme.background,
-                  cursor: "pointer",
+                backgroundColor: theme.text.accent,
+                color: currentTheme.background, 
+                cursor: "pointer",
               }}
             >
               Got it!
@@ -160,14 +88,8 @@ export function PomodoroInfoModal({
 
       <style jsx>{`
         @keyframes zoom-in-95 {
-          0% {
-            transform: scale(0.95);
-            opacity: 0;
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
+          0% { transform: scale(0.95); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
         }
         .animate-in {
           animation-fill-mode: both;

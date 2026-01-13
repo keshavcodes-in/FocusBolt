@@ -782,7 +782,7 @@ function AppBody() {
                           className="inline"
                           fill="currentColor"
                           viewBox="0 0 24 24"
-                          style={{ width: '18px', height: '18px' }}
+                          style={{ width: "18px", height: "18px" }}
                         >
                           <rect x="6" y="4" width="4" height="16" rx="1" />
                           <rect x="14" y="4" width="4" height="16" rx="1" />
@@ -810,7 +810,7 @@ function AppBody() {
                           className=" inline"
                           fill="currentColor"
                           viewBox="0 0 24 24"
-                           style={{ width: '20px', height: '20px' }}
+                          style={{ width: "20px", height: "20px" }}
                         >
                           <path d="M8 5v14l11-7z" />
                         </svg>

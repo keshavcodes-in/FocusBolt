@@ -9,6 +9,7 @@ import { ensurePermission } from "@/lib/notifications";
 import { ColorTheme } from "@/lib/theme";
 import { getColor } from "@/lib/colorUtils";
 import { ProgressChart } from "@/components/progress/progress-chart";
+import { getThemeStyles } from "@/lib/themeStyles";
 
 interface SettingsSheetProps {
   open?: boolean;
@@ -16,7 +17,7 @@ interface SettingsSheetProps {
   currentTheme: ColorTheme;
 }
 
-//  Stepper Component
+// Stepper Component
 interface StepperProps {
   value: number;
   onChange: (value: number) => void;
@@ -24,9 +25,8 @@ interface StepperProps {
   max: number;
   step?: number;
   label: string;
-  currentTheme: ColorTheme;
-  isImageTheme: boolean;
   disabled?: boolean;
+  theme: ReturnType<typeof getThemeStyles>;
 }
 
 function Stepper({
@@ -36,9 +36,8 @@ function Stepper({
   max,
   step = 1,
   label,
-  currentTheme,
-  isImageTheme,
   disabled = false,
+  theme,
 }: StepperProps) {
   const [displayValue, setDisplayValue] = React.useState(String(value));
 
@@ -61,16 +60,13 @@ function Stepper({
 
     const val = e.target.value;
 
-    // When empty, set to 0
     if (val === "" || val === "0") {
       onChange(0);
       return;
     }
 
-    // Parse number
     const numValue = parseInt(val, 10);
 
-    // enforce max
     if (!isNaN(numValue)) {
       onChange(Math.min(numValue, max));
     }
@@ -78,30 +74,14 @@ function Stepper({
 
   return (
     <div className="flex items-center justify-between opacity-100">
-      <Label
-        style={{
-          color: isImageTheme
-            ? "rgba(255, 255, 255, 0.9)"
-            : currentTheme.digitColor,
-        }}
-      >
-        {label}
-      </Label>
+      <Label style={{ color: theme.text.primary }}>{label}</Label>
       <div className="flex items-center gap-2">
         <button
           onClick={handleDecrement}
           disabled={disabled || value <= min}
-          className="w-8 h-8 rounded-lg flex items-center justify-center border transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
           style={{
-            backgroundColor: isImageTheme
-              ? "rgba(255, 255, 255, 0.1)"
-              : currentTheme.background,
-            color: isImageTheme
-              ? "rgba(255, 255, 255, 0.9)"
-              : currentTheme.digitColor,
-            borderColor: isImageTheme
-              ? "rgba(255, 255, 255, 0.3)"
-              : currentTheme.cardBorder,
+            ...theme.item,
             cursor: disabled || value <= min ? "not-allowed" : "pointer",
           }}
         >
@@ -125,11 +105,11 @@ function Stepper({
           min={min}
           max={max}
           step={step}
-          value={value === 0 ? "" : value} // Show empty when 0
+          value={value === 0 ? "" : value}
           onChange={handleInputChange}
           onBlur={() => {
             if (disabled) return;
-            if (value === 0 || value < min) onChange(min); // Set to min when done
+            if (value === 0 || value < min) onChange(min);
           }}
           onFocus={(e) => {
             if (disabled) {
@@ -139,17 +119,9 @@ function Stepper({
             e.target.select();
           }}
           disabled={disabled}
-          className="w-16 px-2 py-1.5 text-center text-sm font-semibold rounded-lg border disabled:opacity-40"
+          className="w-16 px-2 py-1.5 text-center text-sm font-semibold rounded-lg disabled:opacity-40"
           style={{
-            backgroundColor: isImageTheme
-              ? "rgba(255, 255, 255, 0.1)"
-              : currentTheme.background,
-            color: isImageTheme
-              ? "rgba(255, 255, 255, 0.9)"
-              : currentTheme.digitColor,
-            borderColor: isImageTheme
-              ? "rgba(255, 255, 255, 0.3)"
-              : currentTheme.cardBorder,
+            ...theme.item,
             cursor: disabled ? "not-allowed" : "text",
           }}
         />
@@ -157,17 +129,9 @@ function Stepper({
         <button
           onClick={handleIncrement}
           disabled={disabled || value >= max}
-          className="w-8 h-8 rounded-lg flex items-center justify-center border transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
           style={{
-            backgroundColor: isImageTheme
-              ? "rgba(255, 255, 255, 0.1)"
-              : currentTheme.background,
-            color: isImageTheme
-              ? "rgba(255, 255, 255, 0.9)"
-              : currentTheme.digitColor,
-            borderColor: isImageTheme
-              ? "rgba(255, 255, 255, 0.3)"
-              : currentTheme.cardBorder,
+            ...theme.item,
             cursor: disabled || value >= max ? "not-allowed" : "pointer",
           }}
         >
@@ -193,17 +157,11 @@ function Stepper({
 // Preset Pills Component
 interface PresetPillsProps {
   onSelect: (work: number, shortBreak: number, longBreak: number) => void;
-  currentTheme: ColorTheme;
-  isImageTheme: boolean;
   disabled?: boolean;
+  theme: ReturnType<typeof getThemeStyles>;
 }
 
-function PresetPills({
-  onSelect,
-  currentTheme,
-  isImageTheme,
-  disabled = false,
-}: PresetPillsProps) {
+function PresetPills({ onSelect, disabled = false, theme }: PresetPillsProps) {
   const presets = [
     { name: "Classic", icon: "⏱️", work: 25, short: 5, long: 15 },
     { name: "Deep Work", icon: "🎯", work: 120, short: 15, long: 30 },
@@ -213,18 +171,13 @@ function PresetPills({
   const handleClick = (preset: (typeof presets)[number]) => {
     if (disabled) return;
     onSelect(preset.work, preset.short, preset.long);
-    
   };
 
   return (
     <div className="space-y-3">
       <Label
         className="text-sm font-medium"
-        style={{
-          color: isImageTheme
-            ? "rgba(255, 255, 255, 0.8)"
-            : currentTheme.separatorColor,
-        }}
+        style={{ color: theme.text.secondary }}
       >
         Quick Presets
       </Label>
@@ -234,14 +187,9 @@ function PresetPills({
             key={preset.name}
             onClick={() => handleClick(preset)}
             disabled={disabled}
-            className="p-3 rounded-xl border transition-all hover:scale-105 active:scale-95 text-left disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed"
+            className="p-3 rounded-xl transition-all hover:scale-105 active:scale-95 text-left disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: isImageTheme
-                ? "rgba(255, 255, 255, 0.08)"
-                : `${currentTheme.background}40`,
-              borderColor: isImageTheme
-                ? "rgba(255, 255, 255, 0.2)"
-                : currentTheme.cardBorder,
+              ...theme.item,
               cursor: disabled ? "not-allowed" : "pointer",
             }}
           >
@@ -249,23 +197,12 @@ function PresetPills({
               <span className="text-lg">{preset.icon}</span>
               <span
                 className="text-sm font-semibold"
-                style={{
-                  color: isImageTheme
-                    ? "rgba(255, 255, 255, 0.95)"
-                    : currentTheme.digitColor,
-                }}
+                style={{ color: theme.text.primary }}
               >
                 {preset.name}
               </span>
             </div>
-            <p
-              className="text-xs"
-              style={{
-                color: isImageTheme
-                  ? "rgba(255, 255, 255, 0.7)"
-                  : currentTheme.separatorColor,
-              }}
-            >
+            <p className="text-xs" style={{ color: theme.text.secondary }}>
               {preset.work}m / {preset.short}m / {preset.long}m
             </p>
           </button>
@@ -317,34 +254,30 @@ export function SettingsSheet({
   }, [longInterval]);
 
   const handlePresetSelect = (
-  workMin: number,
-  shortMin: number,
-  longMin: number
-) => {
+    workMin: number,
+    shortMin: number,
+    longMin: number
+  ) => {
+    setWork(workMin);
+    setShortB(shortMin);
+    setLongB(longMin);
 
-  setWork(workMin);
-  setShortB(shortMin);
-  setLongB(longMin);
+    const workValue = Math.max(1, Math.min(240, workMin));
+    const shortValue = Math.max(1, Math.min(60, shortMin));
+    const longValue = Math.max(1, Math.min(90, longMin));
+    const longIntValue = Math.max(2, Math.min(12, longInt));
 
-  const workValue = Math.max(1, Math.min(240, workMin));
-  const shortValue = Math.max(1, Math.min(60, shortMin));
-  const longValue = Math.max(1, Math.min(90, longMin));
-  const longIntValue = Math.max(2, Math.min(12, longInt));
+    setDurations({
+      work: workValue * 60,
+      short: shortValue * 60,
+      long: longValue * 60,
+    });
+    setLongInterval(longIntValue);
 
-
-  setDurations({
-    work: workValue * 60,
-    short: shortValue * 60,
-    long: longValue * 60,
-  });
-  setLongInterval(longIntValue);
-
-
-  onOpenChange?.(false);
-};
+    onOpenChange?.(false);
+  };
 
   const save = () => {
-
     const workValue = Math.max(1, Math.min(240, work));
     const shortValue = Math.max(1, Math.min(60, shortB));
     const longValue = Math.max(1, Math.min(90, longB));
@@ -379,6 +312,7 @@ export function SettingsSheet({
 
   const isImageTheme = Boolean(currentTheme.backgroundImage);
   const color = getColor(currentTheme, isImageTheme);
+  const theme = getThemeStyles(currentTheme);
 
   return (
     <>
@@ -414,79 +348,42 @@ export function SettingsSheet({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-40 backdrop-blur-[2px]"
-            style={{
-              backgroundColor: isImageTheme
-                ? "rgba(0, 0, 0, 0.35)"
-                : "rgba(0, 0, 0, 0.25)",
-            }}
+            className="fixed inset-0 z-40 backdrop-blur-sm bg-black/30"
             onClick={() => onOpenChange?.(false)}
           />
 
           {/* Modal Content */}
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <div
-              className="rounded-3xl shadow-2xl overflow-hidden max-w-lg w-full max-h-[85vh] border animate-in zoom-in-95 duration-300"
-              style={{
-                background: isImageTheme
-                  ? "rgba(0, 0, 0, 0.85)"
-                  : currentTheme.background,
-                borderColor: isImageTheme
-                  ? "rgba(255, 255, 255, 0.25)"
-                  : `${currentTheme.cardBorder}80`,
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                boxShadow: isImageTheme
-                  ? "0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15)"
-                  : `0 25px 50px -12px ${currentTheme.cardBorder}40`,
-              }}
+              className="rounded-3xl shadow-2xl overflow-hidden max-w-lg w-full max-h-[85vh] animate-in zoom-in-95 duration-300"
+              style={theme.container}
             >
               {/* Header */}
               <div
                 className="flex items-center justify-between px-6 py-5 border-b"
                 style={{
-                  borderBottomColor: isImageTheme
-                    ? "rgba(255, 255, 255, 0.15)"
-                    : currentTheme.cardBorder,
-                  background: isImageTheme
-                    ? "rgba(0, 0, 0, 0.2)"
-                    : "transparent",
+                  borderBottomColor:
+                    theme.item.border.split("1px solid ")[1] ||
+                    "rgba(0,0,0,0.1)",
                 }}
               >
                 <div className="flex items-center space-x-3">
                   <div
                     className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                    style={{
-                      backgroundColor: isImageTheme
-                        ? "rgba(255, 255, 255, 0.15)"
-                        : `${currentTheme.cardBorder}40`,
-                      border: `1px solid ${
-                        isImageTheme
-                          ? "rgba(255, 255, 255, 0.3)"
-                          : currentTheme.cardBorder
-                      }`,
-                    }}
+                    style={theme.item}
                   >
                     <span className="text-2xl">⚙️</span>
                   </div>
                   <div>
                     <h2
                       className="text-xl font-bold"
-                      style={{
-                        color: isImageTheme
-                          ? "rgba(255, 255, 255, 0.95)"
-                          : currentTheme.digitColor,
-                      }}
+                      style={{ color: theme.text.primary }}
                     >
                       Settings
                     </h2>
                     <p
                       className="text-sm"
-                      style={{
-                        color: isImageTheme
-                          ? "rgba(255, 255, 255, 0.8)"
-                          : currentTheme.separatorColor,
-                      }}
+                      style={{ color: theme.text.secondary }}
                     >
                       Customize sessions and behavior
                     </p>
@@ -494,17 +391,10 @@ export function SettingsSheet({
                 </div>
                 <button
                   onClick={() => onOpenChange?.(false)}
-                  className="p-2 rounded-full transition-all duration-200 hover:scale-110 border"
+                  className="p-2 rounded-full transition-all duration-200 hover:scale-110"
                   style={{
-                    color: isImageTheme
-                      ? "rgba(255, 255, 255, 0.9)"
-                      : currentTheme.separatorColor,
-                    backgroundColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "transparent",
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.3)"
-                      : currentTheme.cardBorder,
+                    color: theme.text.accent,
+                    ...theme.item,
                     cursor: "pointer",
                   }}
                 >
@@ -519,42 +409,23 @@ export function SettingsSheet({
               </div>
 
               {/* Content */}
-              <div
-                className="p-6 overflow-y-auto max-h-[60vh] space-y-6 custom-scrollbar"
-                style={{
-                  background: isImageTheme
-                    ? "rgba(0, 0, 0, 0.1)"
-                    : "transparent",
-                }}
-              >
+              <div className="p-6 overflow-y-auto max-h-[60vh] space-y-6 custom-scrollbar">
                 {/* Preset Pills */}
-                <div
-                  className="p-4 rounded-2xl border"
-                  style={{
-                    backgroundColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.08)"
-                      : `${currentTheme.background}20`,
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : currentTheme.cardBorder,
-                  }}
-                >
+                <div className="p-4 rounded-2xl" style={theme.item}>
                   <PresetPills
                     onSelect={handlePresetSelect}
-                    currentTheme={currentTheme}
-                    isImageTheme={isImageTheme}
                     disabled={isRunning}
+                    theme={theme}
                   />
                   {isRunning && (
                     <div
-                      className="mb-4 mt-4 flex items-start gap-3 rounded-2xl px-4 py-3 border"
+                      className="mb-4 mt-4 flex items-start gap-3 rounded-2xl px-4 py-3 border backdrop-blur-sm"
                       style={{
-                        backgroundColor: isImageTheme
-                          ? "rgba(255, 193, 7, 0.18)" // warm amber on dark
-                          : "rgba(245, 158, 11, 0.12)", // amber-500 on light
-                        borderColor: isImageTheme
-                          ? "rgba(255, 193, 7, 0.6)"
-                          : "rgba(245, 158, 11, 0.6)",
+                        backgroundColor: theme.text.primary + "12",
+                        borderColor: theme.text.primary + "50",
+                        border: `1px solid ${theme.text.primary}50`,
+                        backdropFilter: "blur(12px)",
+                        WebkitBackdropFilter: "blur(12px)",
                       }}
                     >
                       <span className="text-xl" aria-hidden="true">
@@ -564,9 +435,7 @@ export function SettingsSheet({
                         <p
                           className="text-sm font-semibold"
                           style={{
-                            color: isImageTheme
-                              ? "rgba(255, 230, 180, 0.95)"
-                              : "#92400e", // dark amber
+                            color: theme.text.primary + "E5", // 90% opacity primary color
                           }}
                         >
                           Timer is running
@@ -574,9 +443,7 @@ export function SettingsSheet({
                         <p
                           className="text-xs mt-1"
                           style={{
-                            color: isImageTheme
-                              ? "rgba(255, 230, 180, 0.9)"
-                              : "#92400e",
+                            color: theme.text.primary + "D0", // 80% opacity primary color
                           }}
                         >
                           Pause or reset the timer to edit session durations and
@@ -588,35 +455,17 @@ export function SettingsSheet({
                 </div>
 
                 {/* Session Durations with Steppers */}
-                <div
-                  className="p-4 rounded-2xl border"
-                  style={{
-                    backgroundColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.08)"
-                      : `${currentTheme.background}20`,
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : currentTheme.cardBorder,
-                  }}
-                >
+                <div className="p-4 rounded-2xl" style={theme.item}>
                   <h3
                     className="text-base font-semibold mb-1"
-                    style={{
-                      color: isImageTheme
-                        ? "rgba(255, 255, 255, 0.95)"
-                        : currentTheme.digitColor,
-                    }}
+                    style={{ color: theme.text.primary }}
                   >
                     Session Durations
                   </h3>
                   {isRunning && (
                     <p
                       className="text-xs mb-3"
-                      style={{
-                        color: isImageTheme
-                          ? "rgba(255, 255, 255, 0.75)"
-                          : currentTheme.separatorColor,
-                      }}
+                      style={{ color: theme.text.secondary }}
                     >
                       Pause or reset the timer to edit session lengths.
                     </p>
@@ -629,9 +478,8 @@ export function SettingsSheet({
                       max={240}
                       step={5}
                       label="Work (minutes)"
-                      currentTheme={currentTheme}
-                      isImageTheme={isImageTheme}
                       disabled={isRunning}
+                      theme={theme}
                     />
                     <Stepper
                       value={shortB}
@@ -640,9 +488,8 @@ export function SettingsSheet({
                       max={60}
                       step={1}
                       label="Short break (minutes)"
-                      currentTheme={currentTheme}
-                      isImageTheme={isImageTheme}
                       disabled={isRunning}
+                      theme={theme}
                     />
                     <Stepper
                       value={longB}
@@ -651,9 +498,8 @@ export function SettingsSheet({
                       max={90}
                       step={5}
                       label="Long break (minutes)"
-                      currentTheme={currentTheme}
-                      isImageTheme={isImageTheme}
                       disabled={isRunning}
+                      theme={theme}
                     />
                     <Stepper
                       value={longInt}
@@ -662,54 +508,29 @@ export function SettingsSheet({
                       max={12}
                       step={1}
                       label="Long break every"
-                      currentTheme={currentTheme}
-                      isImageTheme={isImageTheme}
                       disabled={isRunning}
+                      theme={theme}
                     />
                   </div>
                 </div>
 
                 {/* Preferences */}
-                <div
-                  className="p-4 rounded-2xl border"
-                  style={{
-                    backgroundColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.08)"
-                      : `${currentTheme.background}20`,
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : currentTheme.cardBorder,
-                  }}
-                >
+                <div className="p-4 rounded-2xl" style={theme.item}>
                   <h3
                     className="text-base font-semibold mb-4"
-                    style={{
-                      color: isImageTheme
-                        ? "rgba(255, 255, 255, 0.95)"
-                        : currentTheme.digitColor,
-                    }}
+                    style={{ color: theme.text.primary }}
                   >
                     Preferences
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label
-                          style={{
-                            color: isImageTheme
-                              ? "rgba(255, 255, 255, 0.9)"
-                              : currentTheme.digitColor,
-                          }}
-                        >
+                        <Label style={{ color: theme.text.primary }}>
                           Auto start next session
                         </Label>
                         <p
                           className="text-xs mt-1"
-                          style={{
-                            color: isImageTheme
-                              ? "rgba(255, 255, 255, 0.7)"
-                              : currentTheme.separatorColor,
-                          }}
+                          style={{ color: theme.text.secondary }}
                         >
                           Automatically begin the next work/break session
                         </p>
@@ -719,28 +540,19 @@ export function SettingsSheet({
                         onCheckedChange={setAutoStartNext}
                         style={{
                           cursor: "pointer",
+                          backgroundColor: theme.text.primary + "60",
                         }}
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label
-                          style={{
-                            color: isImageTheme
-                              ? "rgba(255, 255, 255, 0.9)"
-                              : currentTheme.digitColor,
-                          }}
-                        >
+                        <Label style={{ color: theme.text.primary }}>
                           Pause when the tab is hidden
                         </Label>
                         <p
                           className="text-xs mt-1"
-                          style={{
-                            color: isImageTheme
-                              ? "rgba(255, 255, 255, 0.7)"
-                              : currentTheme.separatorColor,
-                          }}
+                          style={{ color: theme.text.secondary }}
                         >
                           Pause when switching tabs
                         </p>
@@ -750,28 +562,19 @@ export function SettingsSheet({
                         onCheckedChange={setAutoPauseOnBlur}
                         style={{
                           cursor: "pointer",
+                          backgroundColor: theme.text.primary + "60",
                         }}
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label
-                          style={{
-                            color: isImageTheme
-                              ? "rgba(255, 255, 255, 0.9)"
-                              : currentTheme.digitColor,
-                          }}
-                        >
+                        <Label style={{ color: theme.text.primary }}>
                           Notifications
                         </Label>
                         <p
                           className="text-xs mt-1"
-                          style={{
-                            color: isImageTheme
-                              ? "rgba(255, 255, 255, 0.7)"
-                              : currentTheme.separatorColor,
-                          }}
+                          style={{ color: theme.text.secondary }}
                         >
                           Show alerts when sessions end
                         </p>
@@ -782,6 +585,7 @@ export function SettingsSheet({
                           onCheckedChange={handleNotificationToggle}
                           style={{
                             cursor: "pointer",
+                            backgroundColor: theme.text.primary + "60",
                           }}
                         />
                       </div>
@@ -791,26 +595,12 @@ export function SettingsSheet({
 
                 {/* Keyboard Shortcuts Section */}
                 <div
-                  className="hidden sm:block p-4 rounded-2xl border"
-                  style={{
-                    backgroundColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.08)"
-                      : `${currentTheme.background}20`,
-                    color: isImageTheme
-                      ? "rgba(255, 255, 255, 0.95)"
-                      : currentTheme.digitColor,
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : currentTheme.cardBorder,
-                  }}
+                  className="hidden sm:block p-4 rounded-2xl"
+                  style={theme.item}
                 >
                   <h3
                     className="text-base font-semibold mb-4"
-                    style={{
-                      color: isImageTheme
-                        ? "rgba(255, 255, 255, 0.95)"
-                        : currentTheme.digitColor,
-                    }}
+                    style={{ color: theme.text.primary }}
                   >
                     Keyboard Shortcuts
                   </h3>
@@ -830,9 +620,7 @@ export function SettingsSheet({
                           justifyContent: "space-between",
                           alignItems: "center",
                           marginBottom: 10,
-                          color: isImageTheme
-                            ? "rgba(255,255,255,0.85)"
-                            : currentTheme.digitColor,
+                          color: theme.text.primary,
                           fontSize: 14,
                           fontWeight: "500",
                         }}
@@ -841,15 +629,8 @@ export function SettingsSheet({
                         <span
                           style={{
                             padding: "6px 12px",
-                            borderRadius: 8,
-                            backgroundColor: isImageTheme
-                              ? "rgba(255,255,255,0.15)"
-                              : currentTheme.cardBorder,
-                            border: `1.5px solid ${
-                              isImageTheme
-                                ? "rgba(255,255,255,0.3)"
-                                : currentTheme.cardBorder
-                            }`,
+
+                            ...theme.item,
                             fontWeight: "700",
                             fontFamily: "monospace",
                             userSelect: "none",
@@ -864,19 +645,8 @@ export function SettingsSheet({
                     ))}
                   </ul>
                 </div>
-
-                <div
-                  className="p-4"
-                  style={{
-                    color: isImageTheme
-                      ? "rgba(255, 255, 255, 0.95)"
-                      : currentTheme.digitColor,
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : currentTheme.cardBorder,
-                  }}
-                >
-                  <ProgressChart currentTheme={currentTheme} />
+                <div className="p-4 rounded-2xl" style={theme.item}>
+                  <ProgressChart currentTheme={currentTheme} theme={theme} />
                 </div>
               </div>
 
@@ -884,27 +654,16 @@ export function SettingsSheet({
               <div
                 className="flex justify-end gap-3 p-6 border-t"
                 style={{
-                  borderTopColor: isImageTheme
-                    ? "rgba(255, 255, 255, 0.15)"
-                    : currentTheme.cardBorder,
-                  background: isImageTheme
-                    ? "rgba(0, 0, 0, 0.2)"
-                    : "transparent",
+                  borderTopColor:
+                    theme.item.border.split("1px solid ")[1] ||
+                    "rgba(0,0,0,0.1)",
                 }}
               >
                 <button
                   onClick={() => onOpenChange?.(false)}
-                  className="px-4 py-2 text-sm rounded-xl border hover:opacity-80 transition-opacity"
+                  className="px-4 py-2 text-sm rounded-xl hover:opacity-80 transition-opacity"
                   style={{
-                    backgroundColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "transparent",
-                    color: isImageTheme
-                      ? "rgba(255, 255, 255, 0.9)"
-                      : currentTheme.separatorColor,
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.3)"
-                      : currentTheme.cardBorder,
+                    ...theme.item,
                     cursor: "pointer",
                   }}
                 >
@@ -914,18 +673,10 @@ export function SettingsSheet({
                   id="save-settings-btn"
                   onClick={save}
                   disabled={isRunning}
-                  className="px-4 py-2 text-sm rounded-xl border hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 rounded-xl font-semibold transition-all hover:brightness-90 active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : currentTheme.digitColor,
-                    color: isImageTheme
-                      ? "rgba(255, 255, 255, 0.95)"
-                      : currentTheme.background,
-                    borderColor: isImageTheme
-                      ? "rgba(255, 255, 255, 0.4)"
-                      : "transparent",
-                    border: isImageTheme ? "1px solid" : "none",
+                    backgroundColor: theme.text.accent,
+                    color: currentTheme.background,
                     cursor: isRunning ? "not-allowed" : "pointer",
                   }}
                 >
@@ -940,21 +691,15 @@ export function SettingsSheet({
               width: 8px;
             }
             .custom-scrollbar::-webkit-scrollbar-track {
-              background: ${isImageTheme
-                ? "rgba(255, 255, 255, 0.1)"
-                : currentTheme.cardBorder + "20"};
+              background: rgba(0, 0, 0, 0.1);
               border-radius: 4px;
             }
             .custom-scrollbar::-webkit-scrollbar-thumb {
-              background: ${isImageTheme
-                ? "rgba(255, 255, 255, 0.4)"
-                : currentTheme.cardBorder};
+              background: ${theme.text.secondary};
               border-radius: 4px;
             }
             .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-              background: ${isImageTheme
-                ? "rgba(255, 255, 255, 0.6)"
-                : currentTheme.digitColor + "80"};
+              background: ${theme.text.accent};
             }
 
             @keyframes zoom-in-95 {
@@ -980,10 +725,7 @@ export function SettingsSheet({
             input:focus,
             select:focus {
               outline: none;
-              box-shadow: 0 0 0 2px
-                ${isImageTheme
-                  ? "rgba(255, 255, 255, 0.3)"
-                  : currentTheme.digitColor + "40"};
+              box-shadow: 0 0 0 2px ${theme.text.accent}40;
             }
 
             select option {

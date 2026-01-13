@@ -112,7 +112,7 @@ return (
       className="absolute top-0 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
       aria-label="Edit quote"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: isImageTheme ? "rgba(255,255,255,0.6)" : currentTheme.digitColor }}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: isImageTheme ? "rgba(255,255,255,1)" : currentTheme.digitColor }}>
         <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
         <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
       </svg>

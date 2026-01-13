@@ -13,9 +13,11 @@ import {
 } from "recharts";
 import { getWeeklyDataTotalMinutes, isDataEqual } from "@/lib/progress";
 import { ColorTheme } from "@/lib/theme";
+import { getThemeStyles } from "@/lib/themeStyles";
 
 interface ProgressChartProps {
   currentTheme: ColorTheme;
+  theme?: ReturnType<typeof getThemeStyles>;
 }
 
 type DayData = {
@@ -23,7 +25,6 @@ type DayData = {
   totalMinutes: number;
 };
 
-// Helper function to format minutes to hours and minutes
 const formatMinutesToTime = (minutes: number): string => {
   if (minutes < 60) {
     return `${minutes}m`;
@@ -36,21 +37,20 @@ const formatMinutesToTime = (minutes: number): string => {
   return `${hours}h ${mins}m`;
 };
 
-// Get color based on work time 
 const getBarColor = (
   minutes: number,
   maxMinutes: number,
-  isImageTheme: boolean
+  textPrimary: string
 ) => {
   if (maxMinutes === 0) {
-    return isImageTheme ? "rgba(255, 255, 255, 0.15)" : "#E5E7EB";
+    return textPrimary + "20";
   }
 
   const ratio = minutes / maxMinutes;
 
-  if (ratio < 0.33) return "#EF4444"; // Red - lowest turnout
-  if (ratio < 0.66) return "#94A3B8"; // Gray - average
-  return "#3B82F6"; // Blue - highest turnout
+  if (ratio < 0.33) return "#EF4444";
+  if (ratio < 0.66) return "#94A3B8";
+  return "#3B82F6";
 };
 
 const CustomTooltip = ({
@@ -96,11 +96,10 @@ const CustomTooltip = ({
   return null;
 };
 
-// Custom label component for bars
+
 const renderCustomLabel = (
   props: any,
-  isImageTheme: boolean,
-  digitColor: string
+  textPrimary: string
 ) => {
   const { x, y, width, height, value } = props;
 
@@ -112,7 +111,7 @@ const renderCustomLabel = (
     <text
       x={x + width + 8}
       y={y + height / 2}
-      fill={isImageTheme ? "rgba(255, 255, 255, 0.9)" : digitColor}
+      fill={textPrimary}
       fontSize={12}
       fontWeight={600}
       textAnchor="start"
@@ -126,14 +125,12 @@ const renderCustomLabel = (
 const MemoizedBarChart = memo(
   ({
     data,
-    isImageTheme,
-    digitColor,
-    separatorColor,
+    textPrimary,
+    textSecondary,
   }: {
     data: DayData[];
-    isImageTheme: boolean;
-    digitColor: string;
-    separatorColor: string;
+    textPrimary: string;
+    textSecondary: string;
   }) => {
     const maxMinutes = Math.max(...data.map((d) => d.totalMinutes));
 
@@ -151,7 +148,7 @@ const MemoizedBarChart = memo(
             tick={{
               fontSize: 11,
               fontWeight: 500,
-              fill: isImageTheme ? "rgba(255, 255, 255, 0.7)" : separatorColor,
+              fill: textSecondary,
             }}
             axisLine={false}
             tickLine={false}
@@ -168,18 +165,16 @@ const MemoizedBarChart = memo(
             tick={{
               fontSize: 12,
               fontWeight: 500,
-              fill: isImageTheme ? "rgba(255, 255, 255, 0.85)" : digitColor,
+              fill: textPrimary,
             }}
             axisLine={false}
             tickLine={false}
             width={50}
           />
           <Tooltip
-            content={<CustomTooltip isImageTheme={isImageTheme} />}
+            content={<CustomTooltip textPrimary={textPrimary} textSecondary={textSecondary} />}
             cursor={{
-              fill: isImageTheme
-                ? "rgba(255, 255, 255, 0.05)"
-                : "rgba(0,0,0,0.03)",
+              fill: textPrimary + "10",
             }}
             wrapperStyle={{ outline: "none" }}
           />
@@ -187,14 +182,12 @@ const MemoizedBarChart = memo(
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={getBarColor(entry.totalMinutes, maxMinutes, isImageTheme)}
+                fill={getBarColor(entry.totalMinutes, maxMinutes, textPrimary)}
               />
             ))}
             <LabelList
               dataKey="totalMinutes"
-              content={(props) =>
-                renderCustomLabel(props, isImageTheme, digitColor)
-              }
+              content={(props) => renderCustomLabel(props, textPrimary)}
             />
           </Bar>
         </BarChart>
@@ -203,17 +196,12 @@ const MemoizedBarChart = memo(
   }
 );
 
-MemoizedBarChart.displayName = "MemoizedBarChart";
-
-// Empty State Component
 const EmptyState = ({
-  isImageTheme,
-  digitColor,
-  separatorColor,
+  textPrimary,
+  textSecondary,
 }: {
-  isImageTheme: boolean;
-  digitColor: string;
-  separatorColor: string;
+  textPrimary: string;
+  textSecondary: string;
 }) => (
   <div className="flex flex-col items-center justify-center h-[280px] space-y-4">
     <div className="relative">
@@ -221,7 +209,7 @@ const EmptyState = ({
         className="w-16 h-16"
         fill="none"
         viewBox="0 0 24 24"
-        stroke={isImageTheme ? "rgba(255, 255, 255, 0.3)" : separatorColor}
+        stroke={textSecondary}
         strokeWidth={1.5}
       >
         <path
@@ -247,19 +235,12 @@ const EmptyState = ({
       </div>
     </div>
     <div className="text-center space-y-2">
-      <h4
-        className="text-sm font-semibold"
-        style={{
-          color: isImageTheme ? "rgba(255, 255, 255, 0.95)" : digitColor,
-        }}
-      >
+      <h4 className="text-sm font-semibold" style={{ color: textPrimary }}>
         No work sessions yet
       </h4>
       <p
-        className="text-xs max-w-[240px]"
-        style={{
-          color: isImageTheme ? "rgba(255, 255, 255, 0.7)" : separatorColor,
-        }}
+        className="text-xs max-w-60"
+        style={{ color: textSecondary }}
       >
         Start a work session to track your deep work time and build your
         productivity streak!
@@ -268,17 +249,13 @@ const EmptyState = ({
     <div
       className="flex items-center gap-2 px-3 py-2 border rounded-lg"
       style={{
-        backgroundColor: isImageTheme
-          ? "rgba(59, 130, 246, 0.15)"
-          : "rgba(239, 246, 255, 1)",
-        borderColor: isImageTheme
-          ? "rgba(59, 130, 246, 0.3)"
-          : "rgba(191, 219, 254, 1)",
+        backgroundColor: "rgba(239, 246, 255, 0.8)",
+        borderColor: "rgba(191, 219, 254, 0.8)",
       }}
     >
       <svg
         className="w-4 h-4"
-        fill={isImageTheme ? "rgba(96, 165, 250, 1)" : "#2563eb"}
+        fill="#2563eb"
         viewBox="0 0 20 20"
       >
         <path
@@ -287,29 +264,26 @@ const EmptyState = ({
           clipRule="evenodd"
         />
       </svg>
-      <span
-        className="text-xs font-medium"
-        style={{
-          color: isImageTheme ? "rgba(147, 197, 253, 1)" : "#1e40af",
-        }}
-      >
+      <span className="text-xs font-medium" style={{ color: "#1e40af" }}>
         Click Start to begin your first session
       </span>
     </div>
   </div>
 );
 
-export const ProgressChart = memo(({ currentTheme }: ProgressChartProps) => {
+export const ProgressChart = memo(({ currentTheme, theme: themeProp }: ProgressChartProps) => {
   const [data, setData] = useState<DayData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const theme = themeProp || { text: { primary: currentTheme.digitColor, secondary: currentTheme.separatorColor } };
+  const textPrimary = theme.text.primary;
+  const textSecondary = theme.text.secondary;
   const isImageTheme = Boolean(currentTheme.backgroundImage);
 
   const updateData = useCallback(() => {
     try {
       const newData = getWeeklyDataTotalMinutes();
 
-      // Validate data
       const validatedData = newData.map((item) => ({
         label: item.label || "Unknown",
         totalMinutes:
@@ -323,7 +297,6 @@ export const ProgressChart = memo(({ currentTheme }: ProgressChartProps) => {
     } catch (error) {
       console.error("Error fetching chart data:", error);
 
-      // Fallback data with proper day ordering
       const fallbackData: DayData[] = [];
       const today = new Date();
 
@@ -365,33 +338,16 @@ export const ProgressChart = memo(({ currentTheme }: ProgressChartProps) => {
       <div
         className="w-full space-y-4 p-4 sm:p-6 rounded-2xl border"
         style={{
-          backgroundColor: isImageTheme
-            ? "rgba(255, 255, 255, 0.08)"
-            : `${currentTheme.background}20`,
-          borderColor: isImageTheme
-            ? "rgba(255, 255, 255, 0.2)"
-            : currentTheme.cardBorder,
+          backgroundColor: "rgba(255,255,255,0.08)",
+          borderColor: textSecondary,
+          color: textPrimary,
         }}
       >
         <div className="space-y-2">
-          <h3
-            className="text-base font-semibold"
-            style={{
-              color: isImageTheme
-                ? "rgba(255, 255, 255, 0.95)"
-                : currentTheme.digitColor,
-            }}
-          >
+          <h3 className="text-base font-semibold" style={{ color: textPrimary }}>
             Weekly Progress
           </h3>
-          <p
-            className="text-sm"
-            style={{
-              color: isImageTheme
-                ? "rgba(255, 255, 255, 0.7)"
-                : currentTheme.separatorColor,
-            }}
-          >
+          <p className="text-sm" style={{ color: textSecondary }}>
             Deep work time (last 7 days)
           </p>
         </div>
@@ -400,22 +356,11 @@ export const ProgressChart = memo(({ currentTheme }: ProgressChartProps) => {
             <div
               className="w-8 h-8 border-3 rounded-full animate-spin"
               style={{
-                borderColor: isImageTheme
-                  ? "rgba(255, 255, 255, 0.2)"
-                  : `${currentTheme.cardBorder}40`,
-                borderTopColor: isImageTheme
-                  ? "rgba(255, 255, 255, 0.8)"
-                  : currentTheme.digitColor,
+                borderColor: textSecondary,
+                borderTopColor: textPrimary,
               }}
             />
-            <p
-              className="text-sm"
-              style={{
-                color: isImageTheme
-                  ? "rgba(255, 255, 255, 0.7)"
-                  : currentTheme.separatorColor,
-              }}
-            >
+            <p className="text-sm" style={{ color: textSecondary }}>
               Loading...
             </p>
           </div>
@@ -428,123 +373,63 @@ export const ProgressChart = memo(({ currentTheme }: ProgressChartProps) => {
     <div
       className="w-full space-y-4 p-4 sm:p-6 rounded-2xl border"
       style={{
-        backgroundColor: isImageTheme
-          ? "rgba(255, 255, 255, 0.08)"
-          : `${currentTheme.background}20`,
-        borderColor: isImageTheme
-          ? "rgba(255, 255, 255, 0.2)"
-          : currentTheme.cardBorder,
+        backgroundColor: "rgba(255,255,255,0.08)",
+        borderColor: textSecondary,
+        color: textPrimary,
       }}
     >
-      {/* Header */}
       <div className="space-y-1">
         <h3
           className="text-base sm:text-lg font-semibold"
-          style={{
-            color: isImageTheme
-              ? "rgba(255, 255, 255, 0.95)"
-              : currentTheme.digitColor,
-          }}
+          style={{ color: textPrimary }}
         >
           Weekly Progress
         </h3>
-        <p
-          className="text-xs sm:text-sm"
-          style={{
-            color: isImageTheme
-              ? "rgba(255, 255, 255, 0.7)"
-              : currentTheme.separatorColor,
-          }}
-        >
+        <p className="text-xs sm:text-sm" style={{ color: textSecondary }}>
           Deep work time (last 7 days)
         </p>
       </div>
 
-      {/* Show Empty State or Chart */}
       {!hasData ? (
-        <EmptyState
-          isImageTheme={isImageTheme}
-          digitColor={currentTheme.digitColor}
-          separatorColor={currentTheme.separatorColor}
-        />
+        <EmptyState textPrimary={textPrimary} textSecondary={textSecondary} />
       ) : (
         <>
-          {/* Legend */}
           <div className="flex items-center justify-center sm:justify-start gap-4 text-xs sm:text-sm pb-2">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-sm bg-red-500" />
-              <span
-                style={{
-                  color: isImageTheme
-                    ? "rgba(255, 255, 255, 0.8)"
-                    : currentTheme.separatorColor,
-                }}
-              >
-                lowest
-              </span>
+              <span style={{ color: textSecondary }}>lowest</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-sm bg-gray-400" />
-              <span
-                style={{
-                  color: isImageTheme
-                    ? "rgba(255, 255, 255, 0.8)"
-                    : currentTheme.separatorColor,
-                }}
-              >
-                average
-              </span>
+              <span style={{ color: textSecondary }}>average</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-sm bg-blue-500" />
-              <span
-                style={{
-                  color: isImageTheme
-                    ? "rgba(255, 255, 255, 0.8)"
-                    : currentTheme.separatorColor,
-                }}
-              >
-                highest
-              </span>
+              <span style={{ color: textSecondary }}>highest</span>
             </div>
           </div>
 
-          {/* Horizontal Bar Chart */}
           <div className="w-full h-[260px] sm:h-[280px]">
             <MemoizedBarChart
               data={data}
-              isImageTheme={isImageTheme}
-              digitColor={currentTheme.digitColor}
-              separatorColor={currentTheme.separatorColor}
+              textPrimary={textPrimary}
+              textSecondary={textSecondary}
             />
           </div>
 
-          {/* Total Summary */}
           <div
             className="pt-2 border-t"
             style={{
-              borderColor: isImageTheme
-                ? "rgba(255, 255, 255, 0.15)"
-                : currentTheme.cardBorder,
+              borderColor: textSecondary + "40",
             }}
           >
             <div className="flex items-center justify-between text-sm">
-              <span
-                style={{
-                  color: isImageTheme
-                    ? "rgba(255, 255, 255, 0.8)"
-                    : currentTheme.separatorColor,
-                }}
-              >
+              <span style={{ color: textSecondary }}>
                 Total this week
               </span>
               <span
                 className="font-semibold"
-                style={{
-                  color: isImageTheme
-                    ? "rgba(255, 255, 255, 0.95)"
-                    : currentTheme.digitColor,
-                }}
+                style={{ color: textPrimary }}
               >
                 {formatMinutesToTime(totalMinutes)}
               </span>

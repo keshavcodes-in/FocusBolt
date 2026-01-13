@@ -101,11 +101,11 @@ export const colorThemes: ColorTheme[] = [
   },
   //images
   {
-    id: "Anime bg",
-    name: "Anime bg",
+    id: "mountains bg",
+    name: "Mountains bg",
     background: "#ffffff",
     backgroundImage:
-      "https://ik.imagekit.io/jzry83ljs/anime.png?updatedAt=1759218915353",
+      "https://ik.imagekit.io/jzry83ljs/macos-sierra-mountains.jpg",
     backgroundOverlay: "rgba(255, 255, 255, 0.05)", // White overlay for light theme
     cardBackground: "rgba(255, 255, 255, 0.9)",
     cardBorder: "rgba(0, 0, 0, 0.1)",
