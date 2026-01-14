@@ -63,7 +63,7 @@ export function FlipClock({
           />
         </div>
       )}
-      {/* PROGRESS RING: ADDED 2PX BREATHING SPACE FOR MOBILE */}
+      {/* PROGRESS RING*/}
       <div className="progress-frame">
         <svg width="100%" height="100%" className="progress-svg">
           <rect
@@ -207,7 +207,7 @@ export function FlipClock({
 
         @media (max-width: 640px) {
           .flip-clock {
-            padding: 24px 12px; /* Increased padding to give room to the progress bar */
+            padding: 24px 12px; 
             gap: 6px;
           }
           .separator {
@@ -220,7 +220,7 @@ export function FlipClock({
   );
 }
 
-// FlipDigit component logic remains identical to your previous version...
+// FlipDigit 
 function FlipDigit({
   value,
   theme,
