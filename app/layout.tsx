@@ -54,7 +54,9 @@ export default function RootLayout({
       </head>
       <body className={`${dancingScript.variable} font-sans`}>
         <Suspense fallback={<LoaderThree />}>
-          <AppProviders>{children}</AppProviders>
+          <AppProviders>{children}
+           
+          </AppProviders>
         </Suspense>
       </body>
     </html>

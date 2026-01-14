@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Ripple } from "@/components/ui/shadcn-io/ripple";
 import { SettingsSheet } from "@/components/settings/settings-sheet";
 import { TodoList } from "@/components/todo/TodoList";
 import { FocusToggleIcon } from "@/components/timer/focus-mode-toggle";
@@ -45,8 +44,10 @@ function AppBody() {
     setNotifications,
     dailyMinutes,
     hasStartedToday,
+    durations,
   } = usePomodoro();
-
+// Calculate the total seconds for the CURRENT mode from your provider
+const currentTotalSeconds = durations[mode];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -687,7 +688,7 @@ function AppBody() {
                       aria-label="Reset"
                       className="absolute p-1.5 sm:p-2 rounded-full focus:outline-none z-30 hover:opacity-80 transition-opacity"
                       style={{
-                        top: isTablet ? "60px" : isMobile ? "27px" : "25px",
+                        top: isTablet ? "60px" : isMobile ? "27px" : "0px",
                         right: isTablet ? "10px" : isMobile ? "1px" : "50px",
                         background: isImageTheme
                           ? "rgba(255,255,255,0.82)"
@@ -723,23 +724,13 @@ function AppBody() {
                     </button>
                   )}
 
-                  {/* FLIP CLOCK  && Ripple effect*/}
-                  <div className="relative w-full flex items-center justify-center pt-8 sm:pt-0">
-                    {/* Ripple positioned relative to clock container */}
-                    {(mode === "short" || mode === "long") && (
-                      <div className="absolute inset-0 overflow-hidden rounded-xl">
-                        <Ripple
-                          mainSize={isMobile ? 250 : isTablet ? 350 : 400}
-                          mainOpacity={isImageTheme ? 0.75 : 0.55}
-                          numWaves={isMobile ? 4 : isTablet ? 5 : 6}
-                          currentTheme={currentTheme}
-                          className="absolute inset-0 z-0 pointer-events-none"
-                        />
-                      </div>
-                    )}
+                  {/* FLIP CLOCK */}
+                  <div className="relative w-screen  flex items-center justify-center">
+                 
                     <div className=" relative z-10 scale-[0.6] min-[640px]:scale-[0.95] min-[768px]:scale-100 min-[1024px]:scale-110">
                       <FlipClock
                         seconds={remaining}
+                        totalSeconds={currentTotalSeconds}
                         theme={currentTheme}
                         ariaLabel={`${modeLabel(mode)} time remaining`}
                       />
