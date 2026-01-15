@@ -97,34 +97,39 @@ main:fullscreen {
 }
 
 /* Focus mode fullscreen styles */
+/* Focus mode fullscreen styles */
 .fullscreen-mode:fullscreen {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; /* Force horizontal center */
   justify-content: center;
   min-height: 100vh;
+  width: 100vw;
   border: none !important;
   border-radius: 0 !important;
   padding: 2rem 3rem;
   background: inherit !important;
-  overflow: auto; 
+ overflow-x: hidden; /* Prevent horizontal scroll inside fullscreen */
+  overflow-y: auto;
 }
 
-
+/* Ensure the header content is also centered */
 .fullscreen-mode:fullscreen .card-header {
   width: 100%;
-  max-width: 800px;
+  max-width: 600px; /* Narrower container for tighter focus */
   align-self: center;
-  margin-bottom: 1.5rem;
-  flex-shrink: 0; 
+  margin-bottom: 2rem;
+  padding: 0 !important;
 }
 
+/* Stack Pomodoro and Tabs vertically on Focus Mode */
 .fullscreen-mode:fullscreen .card-header > div {
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column !important; /* Stack Pomodoro title on top of Tabs */
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 1.5rem !important;
   width: 100% !important;
 }
-
 /* Ripple animation */
 @keyframes ripple {
   0%, 100% {
@@ -247,5 +252,5 @@ body {
 }
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
-  100% { transform: translateX(400%); }
+  100% { transform: translateX(100%); }
 }

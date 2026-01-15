@@ -46,8 +46,8 @@ function AppBody() {
     hasStartedToday,
     durations,
   } = usePomodoro();
-// Calculate the total seconds for the CURRENT mode from your provider
-const currentTotalSeconds = durations[mode];
+  // Calculate the total seconds for the CURRENT mode from your provider
+  const currentTotalSeconds = durations[mode];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -75,13 +75,13 @@ const currentTotalSeconds = durations[mode];
   }, [isMobile, focusMode, setFocusMode]);
 
   const [currentTheme, setCurrentTheme] = useState<ColorTheme>(() => {
-    if (typeof window === "undefined") return colorThemes[3]; // gun metal/dark grey by default
+    if (typeof window === "undefined") return colorThemes[0]; // gun metal/dark grey by default
     const saved = localStorage.getItem("focusBoltTheme");
     if (saved) {
       const savedTheme = colorThemes.find((t) => t.id === saved);
       if (savedTheme) return savedTheme;
     }
-    return colorThemes[3];
+    return colorThemes[0];
   });
 
   useEffect(() => {
@@ -288,7 +288,7 @@ const currentTotalSeconds = durations[mode];
           >
             {/* HEADER */}
 
-            <header className="flex items-center justify-between gap-2 py-3 sm:py-4 md:py-6">
+            <header className="flex items-center justify-between gap-2 py-1 sm:py-2 md:py-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -592,47 +592,74 @@ const currentTotalSeconds = durations[mode];
                   boxShadow: "none",
                 }}
               >
-                <CardHeader className="pt-2 pb-2 sm:pb-3 md:pb-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                    <div className="flex items-center gap-3">
-                      {!focusMode && (
+                <CardHeader
+                  className={cn(
+                    " transition-all duration-300",
+                    focusMode ? "card-header" : ""
+                  )}
+                >
+                  <div className="flex flex-col gap-4">
+                    {/* TOP ROW: Title on left, Stats & Actions on right */}
+                    <div className="flex items-center justify-between w-full">
+                      {/* LEFT: Section Title */}
+
+                      <div
+                        onClick={() => setShowPomodoroInfo(true)}
+                        className="group cursor-pointer flex items-center gap-2 opacity-80 hover:opacity-100 transition-all"
+                      >
+                        <span
+                          className="text-lg"
+                          style={{ color: currentTheme.digitColor }}
+                        >
+                          ❐
+                        </span>
                         <CardTitle
-                          onClick={() => setShowPomodoroInfo(true)}
-                          className="cursor-pointer text-lg tracking-tight hover:opacity-80 transition-opacity"
+                          className="text-sm font-bold tracking-widest uppercase"
                           style={{
                             color: isImageTheme
-                              ? currentTheme.background
+                              ? "#ffffff"
                               : currentTheme.digitColor,
                             textShadow: isImageTheme
-                              ? "0 2px 4px rgba(0,0,0,0.1)"
+                              ? "0 2px 10px rgba(0,0,0,0.3)"
                               : "none",
                           }}
                         >
-                          ❐ Pomodoro
+                          Pomodoro
                         </CardTitle>
-                      )}
+                      </div>
 
-                      {hasStartedToday && dailyMinutes > 0 && (
-                        <DailyFocusCounter
-                          minutes={dailyMinutes}
-                          currentTheme={currentTheme}
-                          isMobile={isMobile}
-                        />
-                      )}
+                      {/* RIGHT: Focus Counter (Moved here for balance) */}
+                      <div className="flex items-center gap-3">
+                        {hasStartedToday && dailyMinutes > 0 && (
+                          <div className="hidden sm:block">
+                            {" "}
+                            {/* Hidden on tiny screens to prevent crowding */}
+                            <DailyFocusCounter
+                              minutes={dailyMinutes}
+                              currentTheme={currentTheme}
+                              isMobile={isMobile}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <PomodoroInfoModal
-                      isOpen={showPomodoroInfo}
-                      onClose={() => setShowPomodoroInfo(false)}
-                      currentTheme={currentTheme}
-                    />
-
-                    <div className="w-full sm:w-auto">
+                    {/* BOTTOM ROW: Centered Tabs */}
+                    <div className="flex justify-center w-full">
                       <div
-                        className="flex rounded-lg p-1 shadow-[0_3px_10px_rgb(0,0,0,0.2)] w-full sm:w-auto"
+                        className="flex rounded-xl p-1.5 transition-all duration-500 w-full sm:w-auto mt-2"
                         style={{
-                          background: currentTheme.background,
-                          border: `1px solid ${currentTheme.cardBorder}`,
+                          backgroundColor: isImageTheme
+                            ? "rgba(255, 255, 255, 0.12)"
+                            : `${currentTheme.cardBorder}20`,
+                          backdropFilter: "blur(12px)",
+                          WebkitBackdropFilter: "blur(12px)",
+                          border: `1px solid ${
+                            isImageTheme
+                              ? "rgba(255, 255, 255, 0.2)"
+                              : `${currentTheme.cardBorder}40`
+                          }`,
+                          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)",
                         }}
                       >
                         {tabs.map((tab) => (
@@ -643,25 +670,29 @@ const currentTotalSeconds = durations[mode];
                               switchMode(tab.value as any);
                             }}
                             className={`${
-                              viewMode === tab.value ? "" : "hover:opacity-50"
-                            } relative rounded-md px-3 sm:px-4 py-1.5 sm:py-2 text-sm font-medium transition-colors flex-1 sm:flex-none`}
+                              viewMode === tab.value ? "" : "hover:opacity-70"
+                            } relative rounded-lg px-4 sm:px-10 py-2 text-sm font-semibold transition-all flex-1 sm:flex-none`}
                             style={{
-                              color:
-                                viewMode === tab.value
-                                  ? currentTheme.digitColor
-                                  : `${currentTheme.digitColor}80`,
+                              color: isImageTheme
+                                ? "#ffffff"
+                                : viewMode === tab.value
+                                ? currentTheme.digitColor
+                                : `${currentTheme.digitColor}90`,
                               WebkitTapHighlightColor: "transparent",
                             }}
-                            aria-label={`Switch to ${tab.label}`}
                           >
                             {viewMode === tab.value && (
                               <motion.span
                                 layoutId="activeTabBubble"
                                 className="absolute inset-0 z-0"
                                 style={{
-                                  borderRadius: 6,
-                                  backgroundColor: currentTheme.cardBorder,
-                                  boxShadow: `0 1px 3px ${currentTheme.cardBorder}40`,
+                                  borderRadius: 8,
+                                  backgroundColor: isImageTheme
+                                    ? "rgba(255, 255, 255, 0.25)"
+                                    : currentTheme.cardBorder,
+                                  boxShadow: isImageTheme
+                                    ? "0 2px 10px rgba(0,0,0,0.1)"
+                                    : "none",
                                 }}
                                 transition={{
                                   type: "spring",
@@ -678,8 +709,13 @@ const currentTotalSeconds = durations[mode];
                       </div>
                     </div>
                   </div>
-                </CardHeader>
 
+                  <PomodoroInfoModal
+                    isOpen={showPomodoroInfo}
+                    onClose={() => setShowPomodoroInfo(false)}
+                    currentTheme={currentTheme}
+                  />
+                </CardHeader>
                 <CardContent className="flex flex-col items-center gap-1 px-2 sm:px-4 md:px-6 relative">
                   {/* RESET BUTTON */}
                   {!focusMode && (
@@ -726,7 +762,6 @@ const currentTotalSeconds = durations[mode];
 
                   {/* FLIP CLOCK */}
                   <div className="relative w-screen  flex items-center justify-center">
-                 
                     <div className=" relative z-10 scale-[0.6] min-[640px]:scale-[0.95] min-[768px]:scale-100 min-[1024px]:scale-110">
                       <FlipClock
                         seconds={remaining}
@@ -739,7 +774,7 @@ const currentTotalSeconds = durations[mode];
 
                   {/* QUOTE */}
                   <div
-                    className=" hidden sm:block transition-colors duration-300 text-center px-2 sm:px-4 mt-0"
+                    className=" hidden sm:block transition-colors duration-300 text-center px-2 sm:px-4 mt-0 -mb-3"
                     style={{ color: currentTheme.separatorColor, opacity: 0.8 }}
                   >
                     <SessionQuote currentTheme={currentTheme} />

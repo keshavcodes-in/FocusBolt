@@ -157,6 +157,7 @@ export const colorThemes: ColorTheme[] = [
     shadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
     category: "image",
   },
+  
 ];
 
 export const themeCategories = [

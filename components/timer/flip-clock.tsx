@@ -23,7 +23,7 @@ export function FlipClock({
   const safeSeconds = Math.max(0, seconds);
   const mins = Math.floor(safeSeconds / 60);
   const secs = safeSeconds % 60;
-
+  const isImageTheme = Boolean(theme.backgroundImage);
   const isBreak = mode !== "work";
 
   const progress = useMemo(() => {
@@ -45,14 +45,16 @@ export function FlipClock({
 
   return (
     <div aria-label={ariaLabel} role="timer" className="flip-clock">
-     
       {isBreak && (
-        <div className="break-overlay" key={mode}>
+        <div className="break-overlay" key={`${mode}-${isBreak}`}>
           <div
             className="shimmer-sweep"
             style={{
-              
-              background: `linear-gradient(110deg, transparent 20%, ${accentColor}65 50%, transparent 80%)`,
+              background: isImageTheme
+                ? `linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.8) 50%, transparent 60%)`
+                : `linear-gradient(110deg, transparent 20%, ${accentColor}65 50%, transparent 80%)`,
+              mixBlendMode: isImageTheme ? "overlay" : "normal",
+              filter: isImageTheme ? "blur(4px)" : "none",
             }}
           />
           <div
@@ -73,11 +75,8 @@ export function FlipClock({
             height="calc(100% - 4px)"
             rx="26"
             fill="none"
-            stroke={
-              theme.backgroundImage
-                ? "rgba(255,255,255,0.15)"
-                : "rgba(0,0,0,0.05)"
-            }
+            stroke={accentColor}
+            opacity={0.15}
             strokeWidth="3"
           />
           <rect
@@ -158,7 +157,7 @@ export function FlipClock({
         .shimmer-sweep {
           position: absolute;
           inset: 0;
-          width: 400%; 
+          width: 200%;
           animation: sweep 2.5s linear infinite;
           will-change: transform;
         }
@@ -183,7 +182,7 @@ export function FlipClock({
         }
         .progress-frame {
           position: absolute;
-          
+
           top: 2px;
           bottom: 2px;
           left: 2px;
@@ -207,7 +206,7 @@ export function FlipClock({
 
         @media (max-width: 640px) {
           .flip-clock {
-            padding: 24px 12px; 
+            padding: 24px 12px;
             gap: 6px;
           }
           .separator {
@@ -220,7 +219,7 @@ export function FlipClock({
   );
 }
 
-// FlipDigit 
+// FlipDigit
 function FlipDigit({
   value,
   theme,
