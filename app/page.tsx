@@ -226,7 +226,7 @@ function AppBody() {
       if (!promptedBefore) {
         const timer = setTimeout(() => {
           setShowNotifPrompt(true);
-        }, 5000);
+        }, 15000);
         return () => clearTimeout(timer);
       }
     }

@@ -233,13 +233,13 @@ export function SettingsSheet({
   } = usePomodoro();
 
   const [work, setWork] = React.useState<number>(
-    Math.round(durations.work / 60)
+    Math.round(durations.work / 60),
   );
   const [shortB, setShortB] = React.useState<number>(
-    Math.round(durations.short / 60)
+    Math.round(durations.short / 60),
   );
   const [longB, setLongB] = React.useState<number>(
-    Math.round(durations.long / 60)
+    Math.round(durations.long / 60),
   );
   const [longInt, setLongInt] = React.useState<number>(longInterval);
 
@@ -256,7 +256,7 @@ export function SettingsSheet({
   const handlePresetSelect = (
     workMin: number,
     shortMin: number,
-    longMin: number
+    longMin: number,
   ) => {
     setWork(workMin);
     setShortB(shortMin);
@@ -305,7 +305,7 @@ export function SettingsSheet({
     } else {
       setNotifications(false);
       alert(
-        "Notifications are blocked by the browser. Please enable them in browser's site settings."
+        "Notifications are blocked by the browser. Please enable them in browser's site settings.",
       );
     }
   };
@@ -523,6 +523,29 @@ export function SettingsSheet({
                     Preferences
                   </h3>
                   <div className="space-y-4">
+                       <div className="flex items-center justify-between">
+                      <div>
+                        <Label style={{ color: theme.text.primary }}>
+                          Notifications
+                        </Label>
+                        <p
+                          className="text-xs mt-1"
+                          style={{ color: theme.text.secondary }}
+                        >
+                          Show alerts when sessions end
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={notifications}
+                          onCheckedChange={handleNotificationToggle}
+                          style={{
+                            cursor: "pointer",
+                            backgroundColor: theme.text.primary + "60",
+                          }}
+                        />
+                      </div>
+                    </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <Label style={{ color: theme.text.primary }}>
@@ -567,29 +590,7 @@ export function SettingsSheet({
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label style={{ color: theme.text.primary }}>
-                          Notifications
-                        </Label>
-                        <p
-                          className="text-xs mt-1"
-                          style={{ color: theme.text.secondary }}
-                        >
-                          Show alerts when sessions end
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={notifications}
-                          onCheckedChange={handleNotificationToggle}
-                          style={{
-                            cursor: "pointer",
-                            backgroundColor: theme.text.primary + "60",
-                          }}
-                        />
-                      </div>
-                    </div>
+                 
                   </div>
                 </div>
 
