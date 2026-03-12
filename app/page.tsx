@@ -922,7 +922,7 @@ function AppBody() {
           >
             Made with ❤️ by{" "}
             <a
-              href="https://github.com/keshav-builds"
+              href="https://github.com/keshavcodes-in"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-100 transition-opacity duration-200 underline"

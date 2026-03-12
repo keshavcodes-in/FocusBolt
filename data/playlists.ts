@@ -1,6 +1,6 @@
 import { Playlist } from '@/components/music/ExpandedPlayer';
 
-const CDN_BASE = 'https://cdn.jsdelivr.net/gh/keshav-builds/focusbolt-audio@main';
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/keshavcodes-in/focusbolt-audio@main';
 
 export const samplePlaylists: Playlist[] = [
   {
