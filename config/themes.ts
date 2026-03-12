@@ -116,20 +116,6 @@ export const colorThemes: ColorTheme[] = [
   },
 
   {
-    id: "Tokyo Bg",
-    name: "Tokyo Bg",
-    background: "#ffffff",
-    backgroundImage:
-      "https://ik.imagekit.io/jzry83ljs/tokyo.png?updatedAt=1759218913614",
-    backgroundOverlay: "rgba(255, 255, 255, 0.05)", // White overlay for light theme
-    cardBackground: "rgba(255, 255, 255, 0.9)",
-    cardBorder: "rgba(0, 0, 0, 0.1)",
-    digitColor: "#1f2937",
-    separatorColor: "#6b7280",
-    shadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
-    category: "image",
-  },
-  {
     id: "Aesthetic Bg",
     name: "Aesthetic Bg",
     background: "#ffffff",
@@ -144,11 +130,25 @@ export const colorThemes: ColorTheme[] = [
     category: "image",
   },
   {
-    id: "Black_space",
-    name: "Black_space",
+    id: "Black space",
+    name: "Black space",
     background: "#ffffff",
     backgroundImage:
       "https://ik.imagekit.io/jzry83ljs/black_space.jpg?updatedAt=1759218909200",
+    backgroundOverlay: "rgba(255, 255, 255, 0.05)",
+    cardBackground: "rgba(255, 255, 255, 0.9)",
+    cardBorder: "rgba(0, 0, 0, 0.1)",
+    digitColor: "#1f2937",
+    separatorColor: "#6b7280",
+    shadow: "0 8px 32px rgba(0, 0, 0, 0.15)",
+    category: "image",
+  },
+  {
+    id: "Dark Mountains",
+    name: "Dark Mountains",
+    background: "#ffffff",
+    backgroundImage:
+      "https://ik.imagekit.io/jzry83ljs/mountain-dark.jpg",
     backgroundOverlay: "rgba(255, 255, 255, 0.05)",
     cardBackground: "rgba(255, 255, 255, 0.9)",
     cardBorder: "rgba(0, 0, 0, 0.1)",

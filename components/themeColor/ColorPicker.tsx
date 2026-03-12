@@ -142,7 +142,7 @@ if (variant === "mobile") {
                     e.stopPropagation();
                     setActiveCategory(category.id);
                   }}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium whitespace-nowrap transition-all duration-200 shrink-0 ${
                     activeCategory === category.id
                       ? "scale-105"
                       : "opacity-60 active:opacity-80"
@@ -235,7 +235,7 @@ if (variant === "mobile") {
 
                   {/* Image theme */}
                   {theme.category === "image" && (
-                    <div className="absolute inset-0 flex items-end justify-center pb-1.5 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+                    <div className="absolute inset-0 flex items-end justify-center pb-1.5 bg-linear-to-t from-black/60 via-transparent to-transparent">
                       <span className="text-[10px] font-semibold text-white drop-shadow-lg px-1 text-center leading-tight">
                         {theme.name}
                       </span>
@@ -380,7 +380,7 @@ if (variant === "mobile") {
                     color:
                       activeCategory === category.id
                         ? currentTheme.digitColor
-                        : `${currentTheme.separatorColor}80`,
+                        : `${currentTheme.digitColor}90`,
                     backgroundColor:
                       activeCategory === category.id
                         ? currentTheme.background

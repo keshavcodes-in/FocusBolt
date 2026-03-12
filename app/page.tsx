@@ -255,6 +255,27 @@ function AppBody() {
     setShowNotifPrompt(false);
   };
 
+const musicBarProps = {
+  currentTrack: audioPlayer.currentTrack,
+  isPlaying: audioPlayer.isPlaying,
+  isBuffering: audioPlayer.isBuffering,
+  error: audioPlayer.error,
+  onPlayPause: audioPlayer.togglePlayPause,
+  onNext: audioPlayer.playNext,
+  onPrevious: audioPlayer.playPrevious,
+  currentTime: audioPlayer.currentTime,
+  duration: audioPlayer.duration,
+  onSeek: audioPlayer.seek,
+  isExpanded: isExpanded,
+  onToggleExpand: handleToggleExpand,
+  currentTheme: currentTheme,
+  onSelectFirstTrack: () => {
+    if (samplePlaylists.length > 0 && samplePlaylists[0].tracks.length > 0) {
+      handleSelectTrack(samplePlaylists[0].tracks[0]);
+    }
+  },
+};
+
   return (
     <main
       className="min-h-dvh  overflow-x-hidden text-foreground transition-all duration-500 ease-in-out relative"
@@ -784,7 +805,7 @@ function AppBody() {
                   <div
                     className={cn(
                       "flex items-center justify-center gap-4",
-                      isTablet ? "mt-6" : "mt-0"
+                      isTablet ? "mt-6" : "-mt-2"
                     )}
                   >
                     {isRunning ? (
@@ -865,44 +886,17 @@ function AppBody() {
         </div>
 
         {/* MUSIC BAR - STICKY BOTTOM */}
-        <div
-          className="sticky bottom-7 left-0 right-0 z-30 w-full"
-          style={{ marginTop: "auto" }}
-        >
-          <div
-            className={cn(
-              "mx-auto w-full max-w-4xl px-3 sm:px-6 md:px-8",
-              focusMode && "max-w-3xl"
-            )}
-          >
-            <MusicBar
-              currentTrack={audioPlayer.currentTrack}
-              isPlaying={audioPlayer.isPlaying}
-              isBuffering={audioPlayer.isBuffering}
-              error={audioPlayer.error}
-              onPlayPause={audioPlayer.togglePlayPause}
-              onNext={audioPlayer.playNext}
-              onPrevious={audioPlayer.playPrevious}
-              currentTime={audioPlayer.currentTime}
-              duration={audioPlayer.duration}
-              // volume={audioPlayer.volume}
-              onSeek={audioPlayer.seek}
-              // onVolumeChange={audioPlayer.changeVolume}
-              isExpanded={isExpanded}
-              onToggleExpand={handleToggleExpand}
-              currentTheme={currentTheme}
-              onSelectFirstTrack={() => {
-                if (
-                  samplePlaylists.length > 0 &&
-                  samplePlaylists[0].tracks.length > 0
-                ) {
-                  const firstTrack = samplePlaylists[0].tracks[0];
-                  handleSelectTrack(firstTrack);
-                }
-              }}
-            />
-          </div>
+         {/* STICKY BOTTOM — mobile/tablet */}
+      <div className="sticky bottom-7 left-0 right-0 z-30 w-full lg:hidden" style={{ marginTop: "auto" }}>
+        <div className={cn("mx-auto w-full max-w-4xl px-3 sm:px-6 md:px-8", focusMode && "max-w-3xl")}>
+          <MusicBar {...musicBarProps} />
         </div>
+      </div>
+
+      {/* PILL — desktop only */}
+      <div className="hidden lg:flex fixed right-5 top-1/2 -translate-y-1/2 z-30">
+        <MusicBar {...musicBarProps} vertical={true} />
+      </div>
         <footer
           className="  text-center"
           style={{

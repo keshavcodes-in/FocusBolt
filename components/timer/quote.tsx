@@ -11,7 +11,7 @@ const DEFAULT_QUOTE: Quote = {
   text: "Believe you can and you're halfway there",
 };
 
-const MAX_CHARS = 80;
+const MAX_CHARS = 40;
 
 export function SessionQuote({ currentTheme }: { currentTheme: any }) {
   const [quote, setQuote] = useState<Quote>(DEFAULT_QUOTE);

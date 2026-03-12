@@ -1,6 +1,5 @@
 import React from "react";
 import { ColorTheme } from "@/lib/theme";
-import { color } from "motion/react";
 import { getColor } from "@/lib/colorUtils";
 
 interface MusicBarProps {
@@ -18,6 +17,7 @@ interface MusicBarProps {
   currentTheme: ColorTheme;
   onSelectFirstTrack: () => void;
   onSeek: (time: number) => void;
+  vertical?: boolean;
 }
 
 export function MusicBar({
@@ -35,16 +35,203 @@ export function MusicBar({
   currentTheme,
   onSelectFirstTrack,
   onSeek,
+  vertical = false,
 }: MusicBarProps) {
   const isImageTheme = !!currentTheme.backgroundImage;
   const iconColor = isImageTheme ? "#ffffff" : currentTheme.digitColor;
   const color = getColor(currentTheme, isImageTheme);
+
   const handlePlayAction = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!currentTrack) onSelectFirstTrack();
     else onPlayPause();
   };
+  // ── VERTICAL PILL (desktop sidebar) 
+  if (vertical) {
+    return (
+      <div
+        onClick={onToggleExpand}
+        className="flex flex-col items-center gap-2.5 py-5 px-3 rounded-3xl transition-all duration-200 hover:scale-[1.02]"
+        style={{
+          backgroundColor: isImageTheme
+            ? "rgba(255, 255, 255, 0.12)"
+            : `${currentTheme.cardBorder}20`,
+          color: isImageTheme ? "#ffffff" : `${currentTheme.digitColor}`,
+          border: `1px solid ${currentTheme.cardBorder}`,
+          boxShadow: "0 3px 10px rgba(0, 0, 0, 0.2)",
+          cursor: "pointer",
+        }}
+      >
+        {/* Note icon / playing animation */}
+        <div
+          className="w-9 h-9 flex items-center justify-center rounded-md"
+          style={{
+            background: `${currentTheme.background}`,
+            color: currentTheme.digitColor,
+            border: isImageTheme
+              ? `1px solid ${currentTheme.digitColor}`
+              : `1px solid ${color}`,
+            boxShadow: isImageTheme
+              ? "2px 2px 0 0 rgba(255,255,255,0.78)"
+              : `2px 2px 0 0 ${color}`,
+          }}
+        >
+          {isPlaying && !isBuffering ? (
+            <div
+              className="flex items-end justify-center gap-0.5"
+              style={{ height: "24px" }}
+            >
+              
+              <span
+                className="w-1 h-3 bg-current rounded-full animate-bounce"
+                style={{ color: iconColor, animationDuration: "1s" }}
+              />
+              <span
+                className="w-1 h-5 bg-current rounded-full animate-bounce"
+                style={{ color: iconColor, animationDuration: "1.2s" }}
+              />
+              <span
+                className="w-1 h-3 bg-current rounded-full animate-bounce"
+                style={{ color: iconColor, animationDuration: "0.8s" }}
+              />
+            
+            </div>
+          ) : (
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg>
+          )}
+        </div>
 
+       
+
+        {/* Prev */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrevious();
+          }}
+          className="w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
+          style={{
+          
+            background: "transparent",
+            cursor: "pointer",
+          }}
+          aria-label="Previous"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+          </svg>
+        </button>
+
+        {/* Play / Pause */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handlePlayAction(e);
+          }}
+          className="w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
+          style={{
+            backgroundColor: isImageTheme
+              ? "rgba(255, 255, 255, 0.25)"
+              : currentTheme.cardBorder,
+            boxShadow: isImageTheme ? "0 2px 10px rgba(0,0,0,0.1)" : "none",
+            border: `1px solid ${isImageTheme ? "rgba(255,255,255,0.22)" : `${color}28`}`,
+            cursor: "pointer",
+          }}
+          aria-label={isPlaying ? "Pause" : "Play"}
+        >
+          {isBuffering ? (
+            <div className="w-4 h-4 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
+          ) : isPlaying ? (
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+            </svg>
+          ) : (
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </button>
+
+        {/* Next */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext();
+          }}
+          className="w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
+          style={{
+            background: "transparent",
+            cursor: "pointer",
+          }}
+          aria-label="Next"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+          </svg>
+        </button>
+
+        {/* Progress — only when track loaded */}
+        {currentTrack && duration > 0 && (
+          <>
+            <div
+              className="w-6 h-px rounded-full"
+              style={{
+                background: isImageTheme
+                  ? "rgba(255,255,255,0.12)"
+                  : `${currentTheme.cardBorder}60`,
+              }}
+            />
+            <div
+              className="relative rounded-full overflow-visible"
+              style={{
+                width: "2px",
+                height: "48px",
+                background: isImageTheme
+                  ? "rgba(255,255,255,0.35)"
+                  : `${currentTheme.digitColor}35`,
+              }}
+            >
+              {/* filled track */}
+              <div
+                className="absolute top-0 left-0 w-full rounded-full transition-all duration-300 ease-linear"
+                style={{
+                  height: `${(currentTime / duration) * 100}%`,
+                  background: isImageTheme ? "rgba(255,255,255,0.65)" : color,
+                }}
+              />
+              {/* glowing dot */}
+              <div
+                className="absolute left-1/2 -translate-x-1/2 rounded-full transition-all duration-300 ease-linear"
+                style={{
+                  width: "7px",
+                  height: "7px",
+                  top: `calc(${(currentTime / duration) * 100}% - 3.5px)`,
+                  background: isImageTheme ? "#fff" : color,
+                  boxShadow: `0 0 5px 2px ${isImageTheme ? "rgba(255,255,255,0.35)" : `${color}55`}`,
+                }}
+              />
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+  // ── END VERTICAL ───
+
+  // ── HORIZONTAL BAR (mobile / tablet)
   return (
     <div className="w-full flex justify-center px-4 pb-6">
       <div
@@ -69,25 +256,16 @@ export function MusicBar({
             <div className="absolute inset-0 flex items-center justify-center gap-0.5">
               <span
                 className="w-1 h-3 bg-current rounded-full animate-bounce"
-                style={{
-                  color: iconColor,
-                  animationDuration: "1s",
-                }}
-              ></span>
+                style={{ color: iconColor, animationDuration: "1s" }}
+              />
               <span
                 className="w-1 h-5 bg-current rounded-full animate-bounce"
-                style={{
-                  color: iconColor,
-                  animationDuration: "1.2s",
-                }}
-              ></span>
+                style={{ color: iconColor, animationDuration: "1.2s" }}
+              />
               <span
                 className="w-1 h-3 bg-current rounded-full animate-bounce"
-                style={{
-                  color: iconColor,
-                  animationDuration: "0.8s",
-                }}
-              ></span>
+                style={{ color: iconColor, animationDuration: "0.8s" }}
+              />
             </div>
           )}
           {!isPlaying && (
