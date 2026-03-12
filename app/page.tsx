@@ -45,6 +45,7 @@ function AppBody() {
     dailyMinutes,
     hasStartedToday,
     durations,
+    notifications,
   } = usePomodoro();
   // Calculate the total seconds for the CURRENT mode from your provider
   const currentTotalSeconds = durations[mode];
@@ -100,7 +101,7 @@ function AppBody() {
     if (currentTheme.backgroundImage && currentTheme.backgroundOverlay) {
       root.setProperty(
         "--theme-background",
-        `linear-gradient(${currentTheme.backgroundOverlay}, ${currentTheme.backgroundOverlay}), url('${currentTheme.backgroundImage}')`
+        `linear-gradient(${currentTheme.backgroundOverlay}, ${currentTheme.backgroundOverlay}), url('${currentTheme.backgroundImage}')`,
       );
       root.setProperty("--theme-background-size", "cover");
       root.setProperty("--theme-background-position", "center");
@@ -125,7 +126,7 @@ function AppBody() {
       { value: "short", label: "Short Break" },
       { value: "long", label: "Long Break" },
     ],
-    []
+    [],
   );
 
   const [showPomodoroInfo, setShowPomodoroInfo] = React.useState(false);
@@ -157,7 +158,7 @@ function AppBody() {
               if (!isMobile) {
                 e.preventDefault();
                 const target = document.getElementById(
-                  "pomodoro-focus-section"
+                  "pomodoro-focus-section",
                 );
                 if (!target) return;
 
@@ -173,7 +174,7 @@ function AppBody() {
               break;
             case "c": {
               const currentIndex = colorThemes.findIndex(
-                (t) => t.id === currentTheme.id
+                (t) => t.id === currentTheme.id,
               );
               const nextIndex = (currentIndex + 1) % colorThemes.length;
               setCurrentTheme(colorThemes[nextIndex]);
@@ -191,7 +192,7 @@ function AppBody() {
       isMobile,
       isTablet,
       focusMode,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -206,7 +207,7 @@ function AppBody() {
 
   const handleSelectTrack = (track: any) => {
     const playlist = samplePlaylists.find((p) =>
-      p.tracks.some((t) => t.id === track.id)
+      p.tracks.some((t) => t.id === track.id),
     );
     if (playlist) {
       audioPlayer.playTrack(track, playlist.tracks);
@@ -216,65 +217,44 @@ function AppBody() {
   const [todoOpen, setTodoOpen] = React.useState(false);
   const [showNotifPrompt, setShowNotifPrompt] = React.useState(false);
 
-  React.useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      Notification.permission === "default"
-    ) {
-      const promptedBefore = localStorage.getItem("notifPromptDismissed");
-      if (!promptedBefore) {
-        const timer = setTimeout(() => {
-          setShowNotifPrompt(true);
-        }, 15000);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, []);
-
   const handleAcceptNotifications = async () => {
     setShowNotifPrompt(false);
-    localStorage.setItem("notifPromptDismissed", "true");
-
     const granted = await ensurePermission();
     if (granted) {
-      setNotifications(true); // This turns ON the toggle in settings
+      setNotifications(true);
     } else {
       alert(
-        "Notifications are blocked. Please enable them in browser settings."
+        "Notifications are blocked. Please enable them in browser settings.",
       );
     }
   };
-
   const handleDismissNotifications = () => {
     setShowNotifPrompt(false);
-    localStorage.setItem("notifPromptDismissed", "true");
   };
-
   const handleClose = () => {
     setShowNotifPrompt(false);
   };
 
-const musicBarProps = {
-  currentTrack: audioPlayer.currentTrack,
-  isPlaying: audioPlayer.isPlaying,
-  isBuffering: audioPlayer.isBuffering,
-  error: audioPlayer.error,
-  onPlayPause: audioPlayer.togglePlayPause,
-  onNext: audioPlayer.playNext,
-  onPrevious: audioPlayer.playPrevious,
-  currentTime: audioPlayer.currentTime,
-  duration: audioPlayer.duration,
-  onSeek: audioPlayer.seek,
-  isExpanded: isExpanded,
-  onToggleExpand: handleToggleExpand,
-  currentTheme: currentTheme,
-  onSelectFirstTrack: () => {
-    if (samplePlaylists.length > 0 && samplePlaylists[0].tracks.length > 0) {
-      handleSelectTrack(samplePlaylists[0].tracks[0]);
-    }
-  },
-};
+  const musicBarProps = {
+    currentTrack: audioPlayer.currentTrack,
+    isPlaying: audioPlayer.isPlaying,
+    isBuffering: audioPlayer.isBuffering,
+    error: audioPlayer.error,
+    onPlayPause: audioPlayer.togglePlayPause,
+    onNext: audioPlayer.playNext,
+    onPrevious: audioPlayer.playPrevious,
+    currentTime: audioPlayer.currentTime,
+    duration: audioPlayer.duration,
+    onSeek: audioPlayer.seek,
+    isExpanded: isExpanded,
+    onToggleExpand: handleToggleExpand,
+    currentTheme: currentTheme,
+    onSelectFirstTrack: () => {
+      if (samplePlaylists.length > 0 && samplePlaylists[0].tracks.length > 0) {
+        handleSelectTrack(samplePlaylists[0].tracks[0]);
+      }
+    },
+  };
 
   return (
     <main
@@ -304,9 +284,116 @@ const musicBarProps = {
           <div
             className={cn(
               "mx-auto w-full max-w-4xl px-3 sm:px-6 md:px-8",
-              focusMode && "max-w-3xl"
+              focusMode && "max-w-3xl",
             )}
           >
+            {/* FLOATING NOTIFICATION BELL */}
+            <div
+              className="fixed z-10"
+              style={{
+                top: isMobile ? "60px" : "16px",
+                right: isMobile ? "16px" : "20px",
+              }}
+            >
+              <button
+                onClick={() => {
+                  if (notifications) {
+                    setNotifications(false);
+                  } else {
+                    setShowNotifPrompt(true);
+                  }
+                }}
+                aria-label={
+                  notifications
+                    ? "Disable notifications"
+                    : "Enable notifications"
+                }
+                title={
+                  notifications
+                    ? "Notifications on — click to disable"
+                    : "Enable notifications"
+                }
+                className="flex items-center justify-center rounded-md transition-all duration-200 hover:opacity-80 active:scale-95"
+                style={{
+                  width: isMobile ? 36 : 40,
+                  height: isMobile ? 36 : 40,
+                  background: `${currentTheme.background}`,
+                  color: currentTheme.digitColor,
+                  border: isImageTheme
+                    ? `1px solid ${currentTheme.digitColor}`
+                    : `1px solid ${color}`,
+                  boxShadow: isImageTheme
+                    ? "2px 2px 0 0 rgba(255,255,255,0.78)"
+                    : `2px 2px 0 0 ${color}`,
+                  cursor: "pointer",
+                }}
+              >
+                {notifications ? (
+                  /* Bell ON */
+
+                  <svg
+                    width={isMobile ? 20 : 21}
+                    height={isMobile ? 20 : 21}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9.35419 21C10.0593 21.6224 10.9856 22 12 22C13.0145 22 13.9407 21.6224 14.6458 21M18 8C18 6.4087 17.3679 4.88258 16.2427 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.8826 2.63214 7.75738 3.75736C6.63216 4.88258 6.00002 6.4087 6.00002 8C6.00002 11.0902 5.22049 13.206 4.34968 14.6054C3.61515 15.7859 3.24788 16.3761 3.26134 16.5408C3.27626 16.7231 3.31488 16.7926 3.46179 16.9016C3.59448 17 4.19261 17 5.38887 17H18.6112C19.8074 17 20.4056 17 20.5382 16.9016C20.6852 16.7926 20.7238 16.7231 20.7387 16.5408C20.7522 16.3761 20.3849 15.7859 19.6504 14.6054C18.7795 13.206 18 11.0902 18 8Z" />
+                  </svg>
+                ) : (
+                  /* Bell OFF / crossed */
+                  <motion.div
+                    animate={
+                      !notifications
+                        ? { rotate: [0, -12, 8, -4, 0] }
+                        : { rotate: 0 }
+                    }
+                    transition={
+                      !notifications
+                        ? {
+                            duration: 0.35,
+                            ease: "easeInOut",
+                            repeat: Infinity,
+                            repeatDelay: 1.5,
+                          }
+                        : { duration: 0.2 }
+                    }
+                  >
+                    {notifications ? (
+                      <svg
+                        width={isMobile ? 20 : 21}
+                        height={isMobile ? 20 : 21}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M9.35419 21C10.0593 21.6224 10.9856 22 12 22C13.0145 22 13.9407 21.6224 14.6458 21M18 8C18 6.4087 17.3679 4.88258 16.2427 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.8826 2.63214 7.75738 3.75736C6.63216 4.88258 6.00002 6.4087 6.00002 8C6.00002 11.0902 5.22049 13.206 4.34968 14.6054C3.61515 15.7859 3.24788 16.3761 3.26134 16.5408C3.27626 16.7231 3.31488 16.7926 3.46179 16.9016C3.59448 17 4.19261 17 5.38887 17H18.6112C19.8074 17 20.4056 17 20.5382 16.9016C20.6852 16.7926 20.7238 16.7231 20.7387 16.5408C20.7522 16.3761 20.3849 15.7859 19.6504 14.6054C18.7795 13.206 18 11.0902 18 8Z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width={isMobile ? 20 : 21}
+                        height={isMobile ? 20 : 21}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M8.63306 3.03371C9.61959 2.3649 10.791 2 12 2C13.5913 2 15.1174 2.63214 16.2426 3.75736C17.3679 4.88258 18 6.4087 18 8C18 10.1008 18.2702 11.7512 18.6484 13.0324M6.25867 6.25724C6.08866 6.81726 6 7.40406 6 8C6 11.0902 5.22047 13.206 4.34966 14.6054C3.61513 15.7859 3.24786 16.3761 3.26132 16.5408C3.27624 16.7231 3.31486 16.7926 3.46178 16.9016C3.59446 17 4.19259 17 5.38885 17H17M9.35418 21C10.0593 21.6224 10.9856 22 12 22C13.0144 22 13.9407 21.6224 14.6458 21M21 21L3 3" />
+                      </svg>
+                    )}
+                  </motion.div>
+                )}
+              </button>
+            </div>
             {/* HEADER */}
 
             <header className="flex items-center justify-between gap-2 py-1 sm:py-2 md:py-4">
@@ -605,7 +692,7 @@ const musicBarProps = {
                 id="pomodoro-focus-section"
                 className={cn(
                   "relative transition-all duration-300",
-                  focusMode && "fullscreen-mode"
+                  focusMode && "fullscreen-mode",
                 )}
                 style={{
                   background: "transparent",
@@ -616,7 +703,7 @@ const musicBarProps = {
                 <CardHeader
                   className={cn(
                     " transition-all duration-300",
-                    focusMode ? "card-header" : ""
+                    focusMode ? "card-header" : "",
                   )}
                 >
                   <div className="flex flex-col gap-4">
@@ -697,8 +784,8 @@ const musicBarProps = {
                               color: isImageTheme
                                 ? "#ffffff"
                                 : viewMode === tab.value
-                                ? currentTheme.digitColor
-                                : `${currentTheme.digitColor}90`,
+                                  ? currentTheme.digitColor
+                                  : `${currentTheme.digitColor}90`,
                               WebkitTapHighlightColor: "transparent",
                             }}
                           >
@@ -805,7 +892,7 @@ const musicBarProps = {
                   <div
                     className={cn(
                       "flex items-center justify-center gap-4",
-                      isTablet ? "mt-6" : "-mt-2"
+                      isTablet ? "mt-6" : "-mt-2",
                     )}
                   >
                     {isRunning ? (
@@ -886,17 +973,25 @@ const musicBarProps = {
         </div>
 
         {/* MUSIC BAR - STICKY BOTTOM */}
-         {/* STICKY BOTTOM — mobile/tablet */}
-      <div className="sticky bottom-7 left-0 right-0 z-30 w-full lg:hidden" style={{ marginTop: "auto" }}>
-        <div className={cn("mx-auto w-full max-w-4xl px-3 sm:px-6 md:px-8", focusMode && "max-w-3xl")}>
-          <MusicBar {...musicBarProps} />
+        {/* STICKY BOTTOM — mobile/tablet */}
+        <div
+          className="sticky bottom-7 left-0 right-0 z-30 w-full lg:hidden"
+          style={{ marginTop: "auto" }}
+        >
+          <div
+            className={cn(
+              "mx-auto w-full max-w-4xl px-3 sm:px-6 md:px-8",
+              focusMode && "max-w-3xl",
+            )}
+          >
+            <MusicBar {...musicBarProps} />
+          </div>
         </div>
-      </div>
 
-      {/* PILL — desktop only */}
-      <div className="hidden lg:flex fixed right-5 top-1/2 -translate-y-1/2 z-30">
-        <MusicBar {...musicBarProps} vertical={true} />
-      </div>
+        {/* PILL — desktop only */}
+        <div className="hidden lg:flex fixed right-5 top-1/2 -translate-y-1/2 z-30">
+          <MusicBar {...musicBarProps} vertical={true} />
+        </div>
         <footer
           className="  text-center"
           style={{
