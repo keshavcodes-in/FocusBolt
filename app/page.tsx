@@ -891,8 +891,8 @@ function AppBody() {
                   {/* CONTROL BUTTONS */}
                   <div
                     className={cn(
-                      "flex items-center justify-center gap-4",
-                      isTablet ? "mt-6" : "-mt-2",
+                      "flex items-center justify-center gap-4 -mt-2",
+                      // isTablet ? "mt-6" : "mt-0",
                     )}
                   >
                     {isRunning ? (
@@ -992,8 +992,9 @@ function AppBody() {
         <div className="hidden lg:flex fixed right-5 top-1/2 -translate-y-1/2 z-30">
           <MusicBar {...musicBarProps} vertical={true} />
         </div>
+
         <footer
-          className="  text-center"
+          className="text-center"
           style={{
             position: "absolute",
             bottom: 0,

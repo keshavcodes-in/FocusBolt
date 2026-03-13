@@ -46,7 +46,7 @@ export function MusicBar({
     if (!currentTrack) onSelectFirstTrack();
     else onPlayPause();
   };
-  // ── VERTICAL PILL (desktop sidebar) 
+  // ── VERTICAL PILL (desktop sidebar)
   if (vertical) {
     return (
       <div
@@ -81,20 +81,27 @@ export function MusicBar({
               className="flex items-end justify-center gap-0.5"
               style={{ height: "24px" }}
             >
-              
               <span
                 className="w-1 h-3 bg-current rounded-full animate-bounce"
-                style={{ color: iconColor, animationDuration: "1s" }}
+                style={{
+                  color: currentTheme.digitColor,
+                  animationDuration: "1s",
+                }}
               />
               <span
                 className="w-1 h-5 bg-current rounded-full animate-bounce"
-                style={{ color: iconColor, animationDuration: "1.2s" }}
+                style={{
+                  color: currentTheme.digitColor,
+                  animationDuration: "1.2s",
+                }}
               />
               <span
                 className="w-1 h-3 bg-current rounded-full animate-bounce"
-                style={{ color: iconColor, animationDuration: "0.8s" }}
+                style={{
+                  color: currentTheme.digitColor,
+                  animationDuration: "0.8s",
+                }}
               />
-            
             </div>
           ) : (
             <svg
@@ -114,8 +121,6 @@ export function MusicBar({
           )}
         </div>
 
-       
-
         {/* Prev */}
         <button
           onClick={(e) => {
@@ -124,7 +129,6 @@ export function MusicBar({
           }}
           className="w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-150 hover:scale-110 active:scale-90"
           style={{
-          
             background: "transparent",
             cursor: "pointer",
           }}
